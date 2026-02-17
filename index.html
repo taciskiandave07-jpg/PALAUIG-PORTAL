@@ -16,14 +16,12 @@
         header { background: linear-gradient(to bottom, #001f3f, #002b55); color: var(--gold); padding: 25px; text-align: center; border-bottom: 4px double var(--gold); }
         nav { background: var(--white); display: flex; justify-content: center; flex-wrap: wrap; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 10px rgba(0,0,0,0.3); }
         .nav-link { padding: 12px 15px; color: var(--navy); font-weight: bold; cursor: pointer; text-transform: uppercase; font-size: 0.7rem; }
-        .nav-link:hover { background: #eee; }
 
         .container { max-width: 900px; margin: 20px auto; padding: 0 15px; }
         .card { background: white; padding: 20px; border-radius: 4px; margin-bottom: 20px; border: 1px solid var(--gold); box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
         
         h3 { border-bottom: 2px solid var(--gold); padding-bottom: 5px; color: var(--navy); margin-top: 0; }
 
-        /* Tables & Lists */
         table { width: 100%; border-collapse: collapse; font-size: 0.8rem; margin-top: 10px; }
         th { background: var(--gray); padding: 8px; text-align: left; border: 1px solid #ddd; }
         td { padding: 8px; border: 1px solid #ddd; }
@@ -35,13 +33,11 @@
         .btn-offering { background: #27ae60; }
         .btn-gold { background: var(--gold); color: var(--navy); width: 100%; margin-top: 10px; }
 
-        /* Updates Section */
         .update-item { border-left: 4px solid var(--gold); padding: 10px; background: #f9f9f9; margin-bottom: 10px; }
         .update-img { max-width: 100%; border-radius: 4px; margin-top: 10px; display: block; }
 
-        input, select, textarea { width: 100%; padding: 8px; margin: 5px 0; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
+        input, select, textarea { width: 100%; padding: 10px; margin: 8px 0; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
         .hidden { display: none; }
-        .admin-box { border: 2px dashed var(--danger); padding: 15px; margin-top: 10px; }
     </style>
 </head>
 <body>
@@ -59,31 +55,31 @@
 
     <div id="main-app" class="hidden">
         <header>
-            <div style="font-size: 1.5rem; font-weight: bold; letter-spacing: 2px;">ADULLAM BIBLE BAPTIST CHURCH PALAUIG</div>
+            <div style="font-size: 1.5rem; font-weight: bold; letter-spacing: 2px;">ADULLAM BIBLE BAPTIST CHURCH</div>
             <div id="welcome-user" style="color:white; font-size: 0.9rem; margin-top:5px;">Welcome</div>
         </header>
         
         <nav>
             <div class="nav-link" onclick="showTab('home')">Bulletin</div>
-            <div class="nav-link" onclick="showTab('giving')">My Records</div>
+            <div class="nav-link" onclick="showTab('giving')">Reports</div>
             <div class="nav-link" onclick="showTab('updates')">Ministries</div>
             <div class="nav-link admin-only" onclick="showTab('admin')">Office</div>
+            <div class="nav-link" onclick="showTab('sync')">Sync/Settings</div>
             <div class="nav-link" onclick="location.reload()">Logout</div>
         </nav>
 
         <div class="container">
-            
             <div id="tab-home" class="tab-content">
                 <div class="card">
                     <h3>Church Announcements</h3>
-                    <div id="announcement-list">No announcements today.</div>
+                    <div id="announcement-list" style="white-space: pre-wrap; line-height: 1.6;"></div>
                 </div>
             </div>
 
             <div id="tab-giving" class="tab-content hidden">
                 <div class="card">
                     <h3>Financial Stewardship</h3>
-                    <button class="btn btn-offering" style="width:100%; margin-bottom:15px;" onclick="downloadCSV()">📥 Download Categorized Report (CSV)</button>
+                    <button class="btn btn-offering" style="width:100%; margin-bottom:15px;" onclick="downloadCSV()">📥 Download Excel/CSV Report</button>
                     <div id="summary-display" style="display:flex; flex-wrap:wrap; gap:10px; margin-bottom:15px;"></div>
                     <div style="overflow-x:auto;">
                         <table>
@@ -100,73 +96,77 @@
                     <div id="updates-list"></div>
                     <hr>
                     <h4>Post New Update</h4>
-                    <input type="text" id="upd-title" placeholder="Ministry Name / Title">
-                    <textarea id="upd-text" placeholder="Report details..."></textarea>
-                    <input type="text" id="upd-img" placeholder="Image URL (optional)">
-                    <button class="btn btn-offering" onclick="saveUpdate()">Post Update</button>
+                    <input type="text" id="upd-title" placeholder="Ministry Name">
+                    <textarea id="upd-text" placeholder="Write the report here..."></textarea>
+                    <input type="text" id="upd-img" placeholder="Paste Image Link (URL) here">
+                    <button class="btn btn-offering" onclick="saveUpdate()">Post to Board</button>
                 </div>
             </div>
 
             <div id="tab-admin" class="tab-content hidden">
-                <div class="card admin-box">
+                <div class="card" style="border: 2px solid var(--danger);">
                     <h3>Attendance Tracking</h3>
-                    <label>Date:</label>
                     <input type="date" id="att-date">
-                    <input type="number" id="att-count" placeholder="Member Count">
-                    <input type="number" id="att-visitor" placeholder="Visitor Count">
+                    <input type="number" id="att-count" placeholder="Members Present">
+                    <input type="number" id="att-visitor" placeholder="Visitors Present">
                     <button class="btn btn-tithe" onclick="saveAttendance()">Save Attendance</button>
                     <div id="att-history" style="margin-top:10px; font-size:0.75rem;"></div>
                 </div>
 
                 <div class="card">
-                    <h3>Record Contribution</h3>
+                    <h3>Add Record</h3>
                     <select id="adm-member"></select>
-                    <input type="number" id="adm-amt" placeholder="₱ 0.00">
+                    <input type="number" id="adm-amt" placeholder="Amount (₱)">
                     <input type="date" id="adm-date">
                     <div style="display:grid; grid-template-columns: 1fr 1fr; gap:5px;">
                         <button class="btn btn-tithe" onclick="saveRecord('Tithes')">Tithes</button>
+                      <button class="btn btn-tithe" onclick="saveRecord('Anniversary')">Anniversary</button>
                         <button class="btn btn-offering" onclick="saveRecord('Offering')">Offering</button>
-                        <button class="btn btn-tithe" onclick="saveRecord('Anniversary')">Anniversary</button>
                         <button class="btn btn-mission" style="background:#8e44ad" onclick="saveRecord('Mission')">Mission</button>
-                        <button class="btn btn-tithe" onclick="saveRecord('Building')">Building</button>
+                      <button class="btn btn-tithe" onclick="saveRecord('Building')">Building</button>
                         <button class="btn btn-lot" style="background:#d35400" onclick="saveRecord('Lot Fund')">Lot Fund</button>
                     </div>
                 </div>
 
                 <div class="card">
-                    <h3>Management</h3>
-                    <label>Announcements (Members see this on Home):</label>
-                    <textarea id="adm-announcement" placeholder="Enter church news..."></textarea>
+                    <h3>Announcements & Users</h3>
+                    <textarea id="adm-announcement" placeholder="Church news..."></textarea>
                     <button class="btn btn-gold" onclick="saveAnnouncement()">Update Bulletin</button>
                     <hr>
-                    <h4>User Credentials</h4>
-                    <select id="user-to-edit" onchange="loadUserPass()">
-                        <option value="">Select User to Change Password</option>
-                    </select>
-                    <input type="text" id="new-user-pass" placeholder="New Password">
-                    <button class="btn btn-tithe" onclick="changeUserPass()">Update Password</button>
+                    <select id="user-to-edit"><option value="">Select Member to Edit</option></select>
+                    <input type="text" id="new-user-pass" placeholder="Set New Password">
+                    <button class="btn btn-tithe" onclick="changeUserPass()">Change Password</button>
+                    <hr>
+                    <input type="text" id="reg-name" placeholder="Register New Full Name">
+                    <input type="text" id="reg-pass" placeholder="Register Password">
+                    <button class="btn btn-offering" style="width:100%" onclick="registerMember()">Create Member Account</button>
+                </div>
+            </div>
+
+            <div id="tab-sync" class="tab-content hidden">
+                <div class="card">
+                    <h3>Update Your Data</h3>
+                    <p style="font-size: 0.8rem;">Paste the <b>Share Code</b> from your Church Leader below to update your records.</p>
+                    <textarea id="import-code" style="height: 100px;" placeholder="Paste code here..."></textarea>
+                    <button class="btn btn-offering" style="width:100%" onclick="importSync()">Sync My Phone Now</button>
                 </div>
 
-                <div class="card">
-                    <h3>Registration & Sync</h3>
-                    <input type="text" id="reg-name" placeholder="Full Name">
-                    <input type="text" id="reg-pass" placeholder="Password">
-                    <button class="btn btn-offering" style="width:100%" onclick="registerMember()">Register New Member</button>
-                    <br><br>
+                <div class="card admin-only">
+                    <h3>Admin Share Tool</h3>
+                    <p style="font-size: 0.8rem;">Click the button, then copy the code and send it to members.</p>
                     <button class="btn btn-tithe" style="width:100%" onclick="generateSync()">Generate Share Code</button>
-                    <textarea id="sync-code" readonly style="height:40px; font-size:0.6rem; margin-top:5px;"></textarea>
+                    <textarea id="sync-code" readonly onclick="this.select()" style="height: 60px; font-size: 0.6rem; margin-top: 5px;"></textarea>
                 </div>
             </div>
         </div>
     </div>
 
     <script>
-        // Data Keys
-        const M_KEY = "abbc_v15_m"; 
-        const R_KEY = "abbc_v15_r";
-        const U_KEY = "abbc_v15_u"; // Updates
-        const A_KEY = "abbc_v15_a"; // Attendance
-        const B_KEY = "abbc_v15_b"; // Bulletin
+        const M_KEY = "abbc_v16_m"; 
+        const R_KEY = "abbc_v16_r";
+        const U_KEY = "abbc_v16_u"; 
+        const A_KEY = "abbc_v16_a"; 
+        const B_KEY = "abbc_v16_b"; 
 
         let members = JSON.parse(localStorage.getItem(M_KEY)) || [{name: 'Admin', pass: 'admin123', isAdmin: true}];
         let records = JSON.parse(localStorage.getItem(R_KEY)) || [];
@@ -188,7 +188,7 @@
                 document.getElementById('welcome-user').innerText = `Shalom, ${user.name}`;
                 if(!user.isAdmin) document.querySelectorAll('.admin-only').forEach(e => e.classList.add('hidden'));
                 updateUI();
-            } else alert("Invalid credentials.");
+            } else alert("Access Denied.");
         }
 
         function updateUI() {
@@ -197,17 +197,15 @@
             const uSel = document.getElementById('user-to-edit');
             const summary = document.getElementById('summary-display');
             
-            // Update Lists
             gBody.innerHTML = ""; 
             mSel.innerHTML = ""; 
-            uSel.innerHTML = '<option value="">Select User</option>';
+            uSel.innerHTML = '<option value="">Select Member</option>';
             
             members.forEach(m => {
                 if(!m.isAdmin) mSel.innerHTML += `<option>${m.name}</option>`;
-                uSel.innerHTML += `<option value="${m.name}">${m.name} (${m.isAdmin ? 'Admin' : 'Member'})</option>`;
+                uSel.innerHTML += `<option value="${m.name}">${m.name}</option>`;
             });
 
-            // Records with Edit/Delete for Admin
             let totals = {Tithes:0, Offering:0, Mission:0, "Lot Fund":0};
             const visible = records.filter(r => currentUser.isAdmin || r.name === currentUser.name);
             
@@ -219,9 +217,7 @@
 
             summary.innerHTML = Object.keys(totals).map(k => `<div style="background:var(--navy); color:var(--gold); padding:8px; border-radius:4px; font-size:0.7rem;">${k}: ₱${totals[k].toLocaleString()}</div>`).join('');
 
-            // Ministry Updates
-            const updList = document.getElementById('updates-list');
-            updList.innerHTML = updates.map(u => `
+            document.getElementById('updates-list').innerHTML = updates.map(u => `
                 <div class="update-item">
                     <strong>${u.title}</strong> <small>(${u.date})</small>
                     <p>${u.text}</p>
@@ -229,15 +225,10 @@
                 </div>
             `).reverse().join('');
 
-            // Attendance History
             document.getElementById('att-history').innerHTML = attendance.slice(-5).map(a => `<div>${a.date}: ${a.count} Members | ${a.visitor} Visitors</div>`).join('');
-            
-            // Bulletin
             document.getElementById('announcement-list').innerText = bulletin;
             document.getElementById('adm-announcement').value = bulletin;
         }
-
-        // --- Logic Functions ---
 
         function saveRecord(cat) {
             const name = document.getElementById('adm-member').value;
@@ -247,44 +238,38 @@
             records.push({id: Date.now(), date, name, type: cat, amount: amt});
             localStorage.setItem(R_KEY, JSON.stringify(records));
             updateUI();
+            alert("Saved!");
         }
 
         function deleteRecord(id) {
-            if(confirm("Delete this record?")) {
-                records = records.filter(r => r.id !== id);
-                localStorage.setItem(R_KEY, JSON.stringify(records));
-                updateUI();
-            }
+            if(confirm("Delete record?")) { records = records.filter(r => r.id !== id); localStorage.setItem(R_KEY, JSON.stringify(records)); updateUI(); }
         }
 
         function editRecord(id) {
             const rec = records.find(r => r.id === id);
-            const newAmt = prompt("Enter new amount:", rec.amount);
-            if(newAmt) {
-                rec.amount = parseFloat(newAmt);
-                localStorage.setItem(R_KEY, JSON.stringify(records));
-                updateUI();
-            }
+            const newAmt = prompt("New amount:", rec.amount);
+            if(newAmt) { rec.amount = parseFloat(newAmt); localStorage.setItem(R_KEY, JSON.stringify(records)); updateUI(); }
         }
 
         function saveUpdate() {
             const title = document.getElementById('upd-title').value;
             const text = document.getElementById('upd-text').value;
             const img = document.getElementById('upd-img').value;
-            if(!title || !text) return alert("Title and text required");
+            if(!title || !text) return alert("Fill in details");
             updates.push({title, text, img, date: new Date().toLocaleDateString()});
             localStorage.setItem(U_KEY, JSON.stringify(updates));
             updateUI();
+            alert("Report Posted");
         }
 
         function saveAttendance() {
             const date = document.getElementById('att-date').value;
             const count = document.getElementById('att-count').value;
             const visitor = document.getElementById('att-visitor').value;
-            if(!date || !count) return alert("Enter date and count");
             attendance.push({date, count, visitor});
             localStorage.setItem(A_KEY, JSON.stringify(attendance));
             updateUI();
+            alert("Attendance Logged");
         }
 
         function saveAnnouncement() {
@@ -297,50 +282,57 @@
         function changeUserPass() {
             const name = document.getElementById('user-to-edit').value;
             const newPass = document.getElementById('new-user-pass').value;
-            if(!name || !newPass) return alert("Select user and enter new password");
             const idx = members.findIndex(m => m.name === name);
-            members[idx].pass = newPass;
-            localStorage.setItem(M_KEY, JSON.stringify(members));
-            alert("Password updated for " + name);
+            if(idx > -1) { members[idx].pass = newPass; localStorage.setItem(M_KEY, JSON.stringify(members)); alert("Updated!"); }
         }
 
         function registerMember() {
             const name = document.getElementById('reg-name').value.trim();
             const pass = document.getElementById('reg-pass').value.trim();
-            if(members.some(m => m.name === name)) return alert("Exists");
+            if(members.some(m => m.name === name)) return alert("User exists");
             members.push({name, pass, isAdmin: false});
             localStorage.setItem(M_KEY, JSON.stringify(members));
-            updateUI();
+            updateUI(); alert("Member Registered");
         }
 
         function downloadCSV() {
-            let content = "ADULLAM BIBLE BAPTIST CHURCH - SEPARATED RECORDS\n\n";
-            const cats = ["Tithes","Anniversary","Offering", "Mission","Building", "Lot Fund"];
-            
-            cats.forEach(cat => {
-                content += `--- ${cat.toUpperCase()} ---\nDate,Member,Amount\n`;
+            let content = "ADULLAM BIBLE BAPTIST CHURCH RECORDS\n\n";
+            ["Tithes","Anniversary","Offering", "Mission","Building", "Lot Fund"].forEach(cat => {
+                content += `[ ${cat.toUpperCase()} ]\nDate,Member,Amount\n`;
                 records.filter(r => r.type === cat && (currentUser.isAdmin || r.name === currentUser.name))
                        .forEach(r => content += `${r.date},${r.name},${r.amount}\n`);
                 content += "\n";
             });
-
             const blob = new Blob([content], {type:'text/csv'});
             const a = document.createElement('a');
             a.href = URL.createObjectURL(blob);
-            a.download = "Church_Financial_Report.csv";
+            a.download = "Church_Records.csv";
             a.click();
+        }
+
+        function generateSync() {
+            const data = btoa(unescape(encodeURIComponent(JSON.stringify({m: members, r: records, u: updates, a: attendance, b: bulletin}))));
+            document.getElementById('sync-code').value = data;
+        }
+
+        function importSync() {
+            try {
+                const raw = document.getElementById('import-code').value.trim();
+                const data = JSON.parse(decodeURIComponent(escape(atob(raw))));
+                localStorage.setItem(M_KEY, JSON.stringify(data.m));
+                localStorage.setItem(R_KEY, JSON.stringify(data.r));
+                localStorage.setItem(U_KEY, JSON.stringify(data.u));
+                localStorage.setItem(A_KEY, JSON.stringify(data.a));
+                localStorage.setItem(B_KEY, data.b);
+                alert("All data synced successfully!");
+                location.reload();
+            } catch(e) { alert("Invalid Code"); }
         }
 
         function showTab(t) {
             document.querySelectorAll('.tab-content').forEach(tc => tc.classList.add('hidden'));
             document.getElementById('tab-' + t).classList.remove('hidden');
         }
-
-        function generateSync() {
-            const data = btoa(unescape(encodeURIComponent(JSON.stringify({m: members, r: records, u: updates, a: attendance, b: bulletin}))));
-            document.getElementById('sync-code').value = data;
-    
-    }
     </script>
 </body>
 </html>
