@@ -339,7 +339,17 @@
         function generateSync() {
             const data = btoa(unescape(encodeURIComponent(JSON.stringify({m: members, r: records, u: updates, a: attendance, b: bulletin}))));
             document.getElementById('sync-code').value = data;
-        }
+        
+    function importSync() {
+            try {
+                const raw = document.getElementById('import-code').value;
+                const data = JSON.parse(decodeURIComponent(escape(atob(raw))));
+                localStorage.setItem(M_KEY, JSON.stringify(data.m));
+                localStorage.setItem(R_KEY, JSON.stringify(data.r));
+                alert("Data synced successfully!");
+                location.reload();
+            } catch(e) { alert("Error: Invalid Sync Code"); }
+    }
     </script>
 </body>
 </html>
