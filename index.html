@@ -48,7 +48,7 @@
     <div id="auth-screen">
         <div class="card" style="max-width: 320px; margin: 80px auto; text-align: center;">
             <h2 style="color:var(--navy); margin:0;">ADULLAM BIBLE BAPTIST CHURCH PALAUIG</h2>
-            <p style="color:var(--gold); font-weight:bold;">MEMBER PORTAL</p>
+            <p style="color:var(--gold); font-weight:bold;">MEMBERS PORTAL</p>
             <input type="text" id="log-name" placeholder="User Name">
             <input type="password" id="log-pass" placeholder="Password">
             <button class="btn btn-tithe" style="width:100%" onclick="handleLogin()">Login</button>
@@ -57,7 +57,7 @@
 
     <div id="main-app" class="hidden">
         <header>
-            <div style="font-size: 1.5rem; font-weight: bold;">ADULLAM BIBLE BAPTIST CHURCH</div>
+            <div style="font-size: 1.5rem; font-weight: bold;">ADULLAM BIBLE BAPTIST CHURCH PALAUIG</div>
             <div id="welcome-user" style="color:white; font-size: 0.8rem;"></div>
         </header>
         
@@ -155,17 +155,17 @@
 
     <script>
         // --- EMAILJS CONFIG (Replace with your keys) ---
-        (function(){ emailjs.init("YOUR_PUBLIC_KEY"); })();
+        (function(){ emailjs.init("2hSBkJZQ_Xsskx-Kw"); })();
 
         const M_KEY = "abbc_v20_m"; 
         const R_KEY = "abbc_v20_r";
         const C_KEY = "abbc_v20_c"; 
         const B_KEY = "abbc_v20_b"; 
 
-        let members = JSON.parse(localStorage.getItem(M_KEY)) || [{name: 'Admin', email:'', pass: 'admin123', isAdmin: true}];
+        let members = JSON.parse(localStorage.getItem(M_KEY)) || [{name: 'ABBC PALAUIG', email:'abbcpalauig22@gmail.com', pass: 'abbc22', isAdmin: true}];
         let records = JSON.parse(localStorage.getItem(R_KEY)) || [];
         let chats = JSON.parse(localStorage.getItem(C_KEY)) || [];
-        let bulletin = localStorage.getItem(B_KEY) || "Welcome to the portal!";
+        let bulletin = localStorage.getItem(B_KEY) || "BLESSED DAY, WELCOME!";
         
         let currentUser = null;
 
@@ -282,7 +282,7 @@
         }
 
         function sendEmail(to, sub, msg) {
-            emailjs.send("service_abbcpalauig", "2hSBkJZQ_Xsskx-Kw", {to_email: to, subject: sub, message: msg});
+            emailjs.send("service_abbcpalauig", "template_91rrfki", {to_email: to, subject: sub, message: msg});
         }
 
         function generateSync() {
