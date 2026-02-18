@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ADULLAM BIBLE BAPTIST CHURCH PORTAL</title>
+    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
     <style>
         :root { 
             --navy: #001f3f; --gold: #d4af37; --white: #ffffff; 
@@ -28,13 +29,14 @@
         
         .btn { padding: 10px; border: none; cursor: pointer; font-weight: bold; border-radius: 4px; font-size: 0.7rem; transition: 0.2s; color: white; }
         .btn-del { background: var(--danger); padding: 4px 8px; }
-        .btn-edit { background: var(--navy); padding: 4px 8px; margin-right: 5px; }
         .btn-tithe { background: #2c3e50; }
         .btn-offering { background: #27ae60; }
         .btn-gold { background: var(--gold); color: var(--navy); width: 100%; margin-top: 10px; }
 
-        .update-item { border-left: 4px solid var(--gold); padding: 10px; background: #f9f9f9; margin-bottom: 10px; }
-        .update-img { max-width: 100%; border-radius: 4px; margin-top: 10px; display: block; }
+        .chat-container { height: 250px; overflow-y: auto; border: 1px solid #ddd; padding: 10px; margin-bottom: 10px; background: #f9f9f9; display: flex; flex-direction: column; }
+        .bubble { margin-bottom: 8px; padding: 8px; border-radius: 8px; max-width: 80%; font-size: 0.8rem; }
+        .me { align-self: flex-end; background: #dcf8c6; }
+        .them { align-self: flex-start; background: #fff; border: 1px solid #eee; }
 
         input, select, textarea { width: 100%; padding: 10px; margin: 8px 0; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
         .hidden { display: none; }
@@ -45,8 +47,8 @@
 
     <div id="auth-screen">
         <div class="card" style="max-width: 320px; margin: 80px auto; text-align: center;">
-            <h2 style="color:var(--navy); margin:0;">ADULLAM BIBLE BAPTIST CHURCH</h2>
-            <p style="color:var(--gold); font-weight:bold;">PALAUIG PORTAL</p>
+            <h2 style="color:var(--navy); margin:0;">ADULLAM BIBLE BAPTIST</h2>
+            <p style="color:var(--gold); font-weight:bold;">MEMBER PORTAL</p>
             <input type="text" id="log-name" placeholder="User Name">
             <input type="password" id="log-pass" placeholder="Password">
             <button class="btn btn-tithe" style="width:100%" onclick="handleLogin()">Login</button>
@@ -55,16 +57,16 @@
 
     <div id="main-app" class="hidden">
         <header>
-            <div style="font-size: 1.5rem; font-weight: bold; letter-spacing: 2px;">ADULLAM BIBLE BAPTIST CHURCH</div>
-            <div id="welcome-user" style="color:white; font-size: 0.9rem; margin-top:5px;">Welcome</div>
+            <div style="font-size: 1.5rem; font-weight: bold;">ADULLAM BIBLE BAPTIST CHURCH</div>
+            <div id="welcome-user" style="color:white; font-size: 0.8rem;"></div>
         </header>
         
         <nav>
             <div class="nav-link" onclick="showTab('home')">Bulletin</div>
-            <div class="nav-link" onclick="showTab('giving')">Reports</div>
-            <div class="nav-link" onclick="showTab('updates')">Ministries</div>
-            <div class="nav-link admin-only" onclick="showTab('admin')">Office</div>
-            <div class="nav-link" onclick="showTab('sync')">Sync/Settings</div>
+            <div class="nav-link" onclick="showTab('giving')">My Giving</div>
+            <div class="nav-link" onclick="showTab('chat')">Chat</div>
+            <div class="nav-link admin-only" onclick="showTab('admin')">Admin Office</div>
+            <div class="nav-link" onclick="showTab('sync')">Sync</div>
             <div class="nav-link" onclick="location.reload()">Logout</div>
         </nav>
 
@@ -72,15 +74,26 @@
             <div id="tab-home" class="tab-content">
                 <div class="card">
                     <h3>Church Announcements</h3>
-                    <div id="announcement-list" style="white-space: pre-wrap; line-height: 1.6;"></div>
+                    <div id="announcement-list"></div>
+                </div>
+            </div>
+
+            <div id="tab-chat" class="tab-content hidden">
+                <div class="card">
+                    <h3>Brethren Fellowship Chat</h3>
+                    <div class="chat-container" id="chat-box"></div>
+                    <div style="display:flex; gap:5px;">
+                        <input type="text" id="chat-input" placeholder="Type a message...">
+                        <button class="btn btn-offering" onclick="sendChat()">Send</button>
+                    </div>
                 </div>
             </div>
 
             <div id="tab-giving" class="tab-content hidden">
                 <div class="card">
-                    <h3>Financial Stewardship</h3>
-                    <button class="btn btn-offering" style="width:100%; margin-bottom:15px;" onclick="downloadCSV()">📥 Download Excel/CSV Report</button>
-                    <div id="summary-display" style="display:flex; flex-wrap:wrap; gap:10px; margin-bottom:15px;"></div>
+                    <h3>Giving Records</h3>
+                    <button class="btn btn-offering" style="width:100%; margin-bottom:10px;" onclick="downloadCSV()">📥 Download Excel (.csv)</button>
+                    <div id="summary-display" style="display:flex; flex-wrap:wrap; gap:5px; margin-bottom:15px;"></div>
                     <div style="overflow-x:auto;">
                         <table>
                             <thead><tr><th>Date</th><th>Type</th><th>Member</th><th>Amount</th><th class="admin-only">Action</th></tr></thead>
@@ -90,89 +103,69 @@
                 </div>
             </div>
 
-            <div id="tab-updates" class="tab-content hidden">
-                <div class="card">
-                    <h3>Ministry & GNC Updates</h3>
-                    <div id="updates-list"></div>
-                    <hr>
-                    <h4>Post New Update</h4>
-                    <input type="text" id="upd-title" placeholder="Ministry Name">
-                    <textarea id="upd-text" placeholder="Write the report here..."></textarea>
-                    <input type="text" id="upd-img" placeholder="Paste Image Link (URL) here">
-                    <button class="btn btn-offering" onclick="saveUpdate()">Post to Board</button>
-                </div>
-            </div>
-
             <div id="tab-admin" class="tab-content hidden">
-                <div class="card" style="border: 2px solid var(--danger);">
-                    <h3>Attendance Tracking</h3>
-                    <input type="date" id="att-date">
-                    <input type="number" id="att-count" placeholder="Members Present">
-                    <input type="number" id="att-visitor" placeholder="Visitors Present">
-                    <button class="btn btn-tithe" onclick="saveAttendance()">Save Attendance</button>
-                    <div id="att-history" style="margin-top:10px; font-size:0.75rem;"></div>
-                </div>
-
                 <div class="card">
-                    <h3>Add Record</h3>
+                    <h3>Record New Giving</h3>
                     <select id="adm-member"></select>
                     <input type="number" id="adm-amt" placeholder="Amount (₱)">
                     <input type="date" id="adm-date">
-                    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:5px;">
+                    <div style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap:5px;">
                         <button class="btn btn-tithe" onclick="saveRecord('Tithes')">Tithes</button>
-                      <button class="btn btn-tithe" onclick="saveRecord('Anniversary')">Anniversary</button>
                         <button class="btn btn-offering" onclick="saveRecord('Offering')">Offering</button>
-                        <button class="btn btn-mission" style="background:#8e44ad" onclick="saveRecord('Mission')">Mission</button>
-                      <button class="btn btn-tithe" onclick="saveRecord('Building')">Building</button>
-                        <button class="btn btn-lot" style="background:#d35400" onclick="saveRecord('Lot Fund')">Lot Fund</button>
+                        <button class="btn btn-tithe" style="background:#8e44ad" onclick="saveRecord('Mission')">Mission</button>
+                        <button class="btn btn-tithe" style="background:#d35400" onclick="saveRecord('Lot Fund')">Lot Fund</button>
+                        <button class="btn btn-tithe" style="background:#2980b9" onclick="saveRecord('Building')">Building</button>
+                        <button class="btn btn-tithe" style="background:#c0392b" onclick="saveRecord('Anniversary')">Anniversary</button>
                     </div>
                 </div>
 
                 <div class="card">
-                    <h3>Announcements & Users</h3>
-                    <textarea id="adm-announcement" placeholder="Church news..."></textarea>
-                    <button class="btn btn-gold" onclick="saveAnnouncement()">Update Bulletin</button>
+                    <h3>Announcement Manager</h3>
+                    <textarea id="adm-announcement" placeholder="Post new church news..."></textarea>
+                    <button class="btn btn-gold" onclick="saveAnnouncement()">Update & Notify All Members</button>
+                </div>
+
+                <div class="card">
+                    <h3>Member Registration</h3>
+                    <input type="text" id="reg-name" placeholder="Full Name (for login)">
+                    <input type="email" id="reg-email" placeholder="Email (for notifications)">
+                    <input type="text" id="reg-pass" placeholder="Password">
+                    <button class="btn btn-offering" style="width:100%" onclick="registerMember()">Add Member</button>
                     <hr>
-                    <select id="user-to-edit"><option value="">Select Member to Edit</option></select>
-                    <input type="text" id="new-user-pass" placeholder="Set New Password">
-                    <button class="btn btn-tithe" onclick="changeUserPass()">Change Password</button>
-                    <hr>
-                    <input type="text" id="reg-name" placeholder="Register New Full Name">
-                    <input type="text" id="reg-pass" placeholder="Register Password">
-                    <button class="btn btn-offering" style="width:100%" onclick="registerMember()">Create Member Account</button>
+                    <h4>Registered Members</h4>
+                    <div id="member-list-admin" style="font-size:0.75rem;"></div>
                 </div>
             </div>
 
             <div id="tab-sync" class="tab-content hidden">
                 <div class="card">
-                    <h3>Update Your Data</h3>
-                    <p style="font-size: 0.8rem;">Paste the <b>Share Code</b> from your Church Leader below to update your records.</p>
-                    <textarea id="import-code" style="height: 100px;" placeholder="Paste code here..."></textarea>
-                    <button class="btn btn-offering" style="width:100%" onclick="importSync()">Sync My Phone Now</button>
+                    <h3>Sync Data</h3>
+                    <p style="font-size:0.7rem;">Paste the Admin Share Code to update your portal.</p>
+                    <textarea id="import-code" placeholder="Paste code here..."></textarea>
+                    <button class="btn btn-offering" style="width:100%" onclick="importSync()">Update My Portal</button>
                 </div>
-
                 <div class="card admin-only">
-                    <h3>Admin Share Tool</h3>
-                    <p style="font-size: 0.8rem;">Click the button, then copy the code and send it to members.</p>
-                    <button class="btn btn-tithe" style="width:100%" onclick="generateSync()">Generate Share Code</button>
-                    <textarea id="sync-code" readonly onclick="this.select()" style="height: 60px; font-size: 0.6rem; margin-top: 5px;"></textarea>
+                    <h3>Generate Share Code</h3>
+                    <button class="btn btn-tithe" style="width:100%" onclick="generateSync()">Get Share Code</button>
+                    <textarea id="sync-code" readonly style="font-size:0.6rem; height:50px;"></textarea>
                 </div>
             </div>
         </div>
     </div>
 
     <script>
-        const M_KEY = "abbc_v16_m"; 
-        const R_KEY = "abbc_v16_r";
-        const U_KEY = "abbc_v16_u"; 
-        const A_KEY = "abbc_v16_a"; 
-        const B_KEY = "abbc_v16_b"; 
+        // --- EMAILJS CONFIG (Replace with your keys) ---
+        (function(){ emailjs.init("YOUR_PUBLIC_KEY"); })();
 
-        let members = JSON.parse(localStorage.getItem(M_KEY)) || [{name: 'Admin', pass: 'admin123', isAdmin: true}];
+        const M_KEY = "abbc_v20_m"; 
+        const R_KEY = "abbc_v20_r";
+        const C_KEY = "abbc_v20_c"; 
+        const B_KEY = "abbc_v20_b"; 
+
+        let members = JSON.parse(localStorage.getItem(M_KEY)) || [{name: 'Admin', email:'', pass: 'admin123', isAdmin: true}];
         let records = JSON.parse(localStorage.getItem(R_KEY)) || [];
-        let updates = JSON.parse(localStorage.getItem(U_KEY)) || [];
-        let attendance = JSON.parse(localStorage.getItem(A_KEY)) || [];
-        let bulletin = localStorage.getItem(B_KEY) || "Welcome to Adullam Bible Baptist Church!";
+        let chats = JSON.parse(localStorage.getItem(C_KEY)) || [];
+        let bulletin = localStorage.getItem(B_KEY) || "Welcome to the portal!";
         
         let currentUser = null;
 
@@ -180,7 +173,6 @@
             const n = document.getElementById('log-name').value.trim();
             const p = document.getElementById('log-pass').value.trim();
             const user = members.find(m => m.name.toLowerCase() === n.toLowerCase() && m.pass === p);
-            
             if(user) {
                 currentUser = user;
                 document.getElementById('auth-screen').classList.add('hidden');
@@ -188,151 +180,133 @@
                 document.getElementById('welcome-user').innerText = `Shalom, ${user.name}`;
                 if(!user.isAdmin) document.querySelectorAll('.admin-only').forEach(e => e.classList.add('hidden'));
                 updateUI();
-            } else alert("Access Denied.");
+            } else alert("Wrong credentials.");
         }
 
         function updateUI() {
             const gBody = document.getElementById('giving-body');
             const mSel = document.getElementById('adm-member');
-            const uSel = document.getElementById('user-to-edit');
+            const mList = document.getElementById('member-list-admin');
             const summary = document.getElementById('summary-display');
             
-            gBody.innerHTML = ""; 
-            mSel.innerHTML = ""; 
-            uSel.innerHTML = '<option value="">Select Member</option>';
+            gBody.innerHTML = ""; mSel.innerHTML = ""; mList.innerHTML = "";
             
             members.forEach(m => {
-                if(!m.isAdmin) mSel.innerHTML += `<option>${m.name}</option>`;
-                uSel.innerHTML += `<option value="${m.name}">${m.name}</option>`;
+                if(!m.isAdmin) {
+                    mSel.innerHTML += `<option>${m.name}</option>`;
+                    mList.innerHTML += `<div>• ${m.name} (${m.email || 'No Email'})</div>`;
+                }
             });
 
-            let totals = {Tithes:0, Offering:0, Mission:0, "Lot Fund":0};
+            const cats = ["Tithes","Offering","Mission","Lot Fund","Building","Anniversary"];
+            let totals = {}; cats.forEach(c => totals[c] = 0);
+
             const visible = records.filter(r => currentUser.isAdmin || r.name === currentUser.name);
-            
             visible.sort((a,b) => b.id - a.id).forEach(r => {
                 if(totals.hasOwnProperty(r.type)) totals[r.type] += r.amount;
-                let actionBtn = currentUser.isAdmin ? `<td><button class="btn btn-edit" onclick="editRecord(${r.id})">✎</button><button class="btn btn-del" onclick="deleteRecord(${r.id})">X</button></td>` : '';
-                gBody.innerHTML += `<tr><td>${r.date}</td><td>${r.type}</td><td>${r.name}</td><td>₱${r.amount.toLocaleString()}</td>${actionBtn}</tr>`;
+                gBody.innerHTML += `<tr><td>${r.date}</td><td>${r.type}</td><td>${r.name}</td><td>₱${r.amount}</td>${currentUser.isAdmin ? `<td><button class="btn btn-del" onclick="deleteRecord(${r.id})">X</button></td>` : ''}</tr>`;
             });
 
-            summary.innerHTML = Object.keys(totals).map(k => `<div style="background:var(--navy); color:var(--gold); padding:8px; border-radius:4px; font-size:0.7rem;">${k}: ₱${totals[k].toLocaleString()}</div>`).join('');
-
-            document.getElementById('updates-list').innerHTML = updates.map(u => `
-                <div class="update-item">
-                    <strong>${u.title}</strong> <small>(${u.date})</small>
-                    <p>${u.text}</p>
-                    ${u.img ? `<img src="${u.img}" class="update-img">` : ''}
-                </div>
-            `).reverse().join('');
-
-            document.getElementById('att-history').innerHTML = attendance.slice(-5).map(a => `<div>${a.date}: ${a.count} Members | ${a.visitor} Visitors</div>`).join('');
+            summary.innerHTML = Object.keys(totals).map(k => `<div style="background:var(--navy); color:var(--gold); padding:5px; border-radius:3px; font-size:0.65rem;">${k}: ₱${totals[k]}</div>`).join('');
             document.getElementById('announcement-list').innerText = bulletin;
-            document.getElementById('adm-announcement').value = bulletin;
+            renderChat();
         }
 
         function saveRecord(cat) {
             const name = document.getElementById('adm-member').value;
             const amt = parseFloat(document.getElementById('adm-amt').value);
             const date = document.getElementById('adm-date').value || new Date().toLocaleDateString();
-            if(!amt) return alert("Enter amount");
+            if(!amt) return alert("Input amount");
+
             records.push({id: Date.now(), date, name, type: cat, amount: amt});
             localStorage.setItem(R_KEY, JSON.stringify(records));
+            
+            const m = members.find(mem => mem.name === name);
+            if(m && m.email) sendEmail(m.email, "Giving Recorded", `Hi ${name}, your ${cat} of ₱${amt} was recorded on ${date}.`);
+            
             updateUI();
-            alert("Saved!");
+            alert("Record Saved & Member Notified.");
         }
 
-        function deleteRecord(id) {
-            if(confirm("Delete record?")) { records = records.filter(r => r.id !== id); localStorage.setItem(R_KEY, JSON.stringify(records)); updateUI(); }
-        }
-
-        function editRecord(id) {
-            const rec = records.find(r => r.id === id);
-            const newAmt = prompt("New amount:", rec.amount);
-            if(newAmt) { rec.amount = parseFloat(newAmt); localStorage.setItem(R_KEY, JSON.stringify(records)); updateUI(); }
-        }
-
-        function saveUpdate() {
-            const title = document.getElementById('upd-title').value;
-            const text = document.getElementById('upd-text').value;
-            const img = document.getElementById('upd-img').value;
-            if(!title || !text) return alert("Fill in details");
-            updates.push({title, text, img, date: new Date().toLocaleDateString()});
-            localStorage.setItem(U_KEY, JSON.stringify(updates));
+        function registerMember() {
+            const name = document.getElementById('reg-name').value.trim();
+            const email = document.getElementById('reg-email').value.trim();
+            const pass = document.getElementById('reg-pass').value.trim();
+            if(!name || !pass) return alert("Name and Password required.");
+            members.push({name, email, pass, isAdmin: false});
+            localStorage.setItem(M_KEY, JSON.stringify(members));
             updateUI();
-            alert("Report Posted");
+            alert("Member Registered.");
         }
 
-        function saveAttendance() {
-            const date = document.getElementById('att-date').value;
-            const count = document.getElementById('att-count').value;
-            const visitor = document.getElementById('att-visitor').value;
-            attendance.push({date, count, visitor});
-            localStorage.setItem(A_KEY, JSON.stringify(attendance));
-            updateUI();
-            alert("Attendance Logged");
+        function downloadCSV() {
+            let csv = "CATEGORY,DATE,MEMBER,AMOUNT\n";
+            const cats = ["Tithes","Offering","Mission","Lot Fund","Building","Anniversary"];
+            let grand = 0;
+            cats.forEach(c => {
+                const filtered = records.filter(r => r.type === c);
+                const sub = filtered.reduce((sum, r) => sum + r.amount, 0);
+                grand += sub;
+                filtered.forEach(r => csv += `${c},${r.date},${r.name},${r.amount}\n`);
+                csv += `TOTAL ${c},,,${sub}\n\n`;
+            });
+            csv += `GRAND TOTAL,,,${grand}`;
+            const blob = new Blob([csv], {type:'text/csv'});
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = "Church_Report.csv";
+            a.click();
+        }
+
+        function sendChat() {
+            const msg = document.getElementById('chat-input').value;
+            if(!msg) return;
+            chats.push({user: currentUser.name, text: msg, time: new Date().toLocaleTimeString()});
+            localStorage.setItem(C_KEY, JSON.stringify(chats));
+            document.getElementById('chat-input').value = "";
+            renderChat();
+        }
+
+        function renderChat() {
+            const box = document.getElementById('chat-box');
+            box.innerHTML = chats.map(c => `<div class="bubble ${c.user === currentUser.name ? 'me' : 'them'}"><b>${c.user}</b>: ${c.text}</div>`).join('');
+            box.scrollTop = box.scrollHeight;
         }
 
         function saveAnnouncement() {
             bulletin = document.getElementById('adm-announcement').value;
             localStorage.setItem(B_KEY, bulletin);
-            alert("Bulletin Updated");
+            members.forEach(m => { if(m.email) sendEmail(m.email, "Church Announcement", bulletin); });
+            alert("Updated & Notified via Email.");
             updateUI();
         }
 
-        function changeUserPass() {
-            const name = document.getElementById('user-to-edit').value;
-            const newPass = document.getElementById('new-user-pass').value;
-            const idx = members.findIndex(m => m.name === name);
-            if(idx > -1) { members[idx].pass = newPass; localStorage.setItem(M_KEY, JSON.stringify(members)); alert("Updated!"); }
-        }
-
-        function registerMember() {
-            const name = document.getElementById('reg-name').value.trim();
-            const pass = document.getElementById('reg-pass').value.trim();
-            if(members.some(m => m.name === name)) return alert("User exists");
-            members.push({name, pass, isAdmin: false});
-            localStorage.setItem(M_KEY, JSON.stringify(members));
-            updateUI(); alert("Member Registered");
-        }
-
-        function downloadCSV() {
-            let content = "ADULLAM BIBLE BAPTIST CHURCH RECORDS\n\n";
-            ["Tithes","Anniversary","Offering", "Mission","Building", "Lot Fund"].forEach(cat => {
-                content += `[ ${cat.toUpperCase()} ]\nDate,Member,Amount\n`;
-                records.filter(r => r.type === cat && (currentUser.isAdmin || r.name === currentUser.name))
-                       .forEach(r => content += `${r.date},${r.name},${r.amount}\n`);
-                content += "\n";
-            });
-            const blob = new Blob([content], {type:'text/csv'});
-            const a = document.createElement('a');
-            a.href = URL.createObjectURL(blob);
-            a.download = "Church_Records.csv";
-            a.click();
+        function sendEmail(to, sub, msg) {
+            emailjs.send("service_abbcpalauig", "2hSBkJZQ_Xsskx-Kw", {to_email: to, subject: sub, message: msg});
         }
 
         function generateSync() {
-            const data = btoa(unescape(encodeURIComponent(JSON.stringify({m: members, r: records, u: updates, a: attendance, b: bulletin}))));
+            const data = btoa(unescape(encodeURIComponent(JSON.stringify({m:members, r:records, c:chats, b:bulletin}))));
             document.getElementById('sync-code').value = data;
         }
 
         function importSync() {
             try {
-                const raw = document.getElementById('import-code').value.trim();
-                const data = JSON.parse(decodeURIComponent(escape(atob(raw))));
+                const data = JSON.parse(decodeURIComponent(escape(atob(document.getElementById('import-code').value.trim()))));
                 localStorage.setItem(M_KEY, JSON.stringify(data.m));
                 localStorage.setItem(R_KEY, JSON.stringify(data.r));
-                localStorage.setItem(U_KEY, JSON.stringify(data.u));
-                localStorage.setItem(A_KEY, JSON.stringify(data.a));
+                localStorage.setItem(C_KEY, JSON.stringify(data.c));
                 localStorage.setItem(B_KEY, data.b);
-                alert("All data synced successfully!");
-                location.reload();
+                alert("Synced!"); location.reload();
             } catch(e) { alert("Invalid Code"); }
         }
 
         function showTab(t) {
-            document.querySelectorAll('.tab-content').forEach(tc => tc.classList.add('hidden'));
-            document.getElementById('tab-' + t).classList.remove('hidden');
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.add('hidden'));
+            document.getElementById('tab-'+t).classList.remove('hidden');
         }
+
+        function deleteRecord(id) { if(confirm("Delete?")) { records = records.filter(r => r.id !== id); localStorage.setItem(R_KEY, JSON.stringify(records)); updateUI(); }}
     </script>
 </body>
 </html>
