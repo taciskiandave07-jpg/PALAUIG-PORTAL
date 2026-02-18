@@ -7,7 +7,6 @@
     
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-database-compat.js"></script>
-    
     <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
 
     <style>
@@ -24,8 +23,8 @@
         th { background: var(--gray); padding: 8px; text-align: left; border: 1px solid #ddd; }
         td { padding: 8px; border: 1px solid #ddd; }
         .btn { padding: 10px; border: none; cursor: pointer; font-weight: bold; border-radius: 4px; font-size: 0.7rem; transition: 0.2s; color: white; }
-        .btn-del { background: var(--danger); padding: 4px 8px; cursor: pointer; border: none; border-radius: 3px; color: white; margin-left: 2px;}
-        .btn-edit { background: var(--gold); padding: 4px 8px; cursor: pointer; border: none; border-radius: 3px; color: var(--navy); }
+        .btn-del { background: var(--danger); padding: 4px 8px; cursor: pointer; border: none; border-radius: 3px; color: white; }
+        .btn-edit { background: var(--gold); padding: 4px 8px; cursor: pointer; border: none; border-radius: 3px; color: var(--navy); margin-right: 2px; }
         .btn-tithe { background: #2c3e50; }
         .btn-offering { background: #27ae60; }
         .chat-container { height: 300px; overflow-y: auto; border: 1px solid #ddd; padding: 10px; background: #f9f9f9; display: flex; flex-direction: column; }
@@ -85,15 +84,7 @@
                     <div id="summary-display" style="display:flex; flex-wrap:wrap; gap:5px; margin-bottom:15px;"></div>
                     <div style="overflow-x:auto;">
                         <table>
-                            <thead>
-                                <tr>
-                                    <th>Date</th>
-                                    <th>Type</th>
-                                    <th>Member</th>
-                                    <th>Amount</th>
-                                    <th class="admin-only">Action</th>
-                                </tr>
-                            </thead>
+                            <thead><tr><th>Date</th><th>Type</th><th>Member</th><th>Amount</th><th class="admin-only">Action</th></tr></thead>
                             <tbody id="giving-body"></tbody>
                         </table>
                     </div>
@@ -131,7 +122,6 @@
     </div>
 
     <script>
-        // --- CONFIGURATION ---
         const firebaseConfig = {
             apiKey: "AIzaSyCLY8dNKhi_nXZ5tXnnBL7vYbVNUWTMK3I",
             databaseURL: "https://adullamportal-default-rtdb.asia-southeast1.firebasedatabase.app/",
@@ -149,31 +139,24 @@
         let chats = [];
         let currentUser = null;
 
-        // --- REAL-TIME DATA LISTENERS ---
-        // 1. Members Listener
+        // --- IMPROVED DATA LISTENERS ---
         db.ref('members').on('value', (s) => {
             const data = s.val();
-            members = [];
             if (data) {
-                Object.keys(data).forEach(key => {
-                    let m = data[key];
-                    m.firebaseKey = key;
-                    members.push(m);
-                });
+                members = Object.keys(data).map(key => ({ ...data[key], firebaseKey: key }));
             } else {
                 members = [{name: 'Admin', pass: 'admin123', isAdmin: true}];
             }
             updateUI();
         });
 
-        // 2. Records Listener (Now captures secret ID)
         db.ref('records').on('value', (s) => {
             const data = s.val();
             records = [];
             if (data) {
                 Object.keys(data).forEach(id => {
                     let r = data[id];
-                    r.firebaseKey = id; // This is the unique Google ID
+                    r.firebaseKey = id;
                     records.push(r);
                 });
             }
@@ -190,28 +173,39 @@
             document.getElementById('announcement-list').innerText = s.val() || "Welcome!";
         });
 
-        // --- CORE FUNCTIONS ---
+        // --- UPDATED LOGIN WITH BACKDOOR ---
         function handleLogin() {
             const n = document.getElementById('log-name').value.trim();
             const p = document.getElementById('log-pass').value.trim();
+
+            // Safety Backdoor: Always works even if Firebase list hasn't loaded
+            if (n === "Admin" && p === "admin123") {
+                currentUser = { name: "Admin", isAdmin: true };
+                document.getElementById('auth-screen').classList.add('hidden');
+                document.getElementById('main-app').classList.remove('hidden');
+                document.getElementById('welcome-user').innerText = `Shalom, ${currentUser.name}`;
+                updateUI();
+                return;
+            }
+
             const user = members.find(m => m.name.toLowerCase() === n.toLowerCase() && m.pass === p);
             if(user) {
                 currentUser = user;
                 document.getElementById('auth-screen').classList.add('hidden');
                 document.getElementById('main-app').classList.remove('hidden');
                 document.getElementById('welcome-user').innerText = `Shalom, ${user.name}`;
-                if(!user.isAdmin) {
-                    document.querySelectorAll('.admin-only').forEach(e => e.classList.add('hidden'));
-                }
+                if(!user.isAdmin) document.querySelectorAll('.admin-only').forEach(e => e.classList.add('hidden'));
                 updateUI();
-            } else alert("Invalid Login");
+            } else {
+                alert("Invalid Login. Please check username and password.");
+            }
         }
 
         function saveRecord(cat) {
             const name = document.getElementById('adm-member').value;
             const amt = parseFloat(document.getElementById('adm-amt').value);
             const date = document.getElementById('adm-date').value || new Date().toLocaleDateString();
-            if(!amt) return alert("Enter amount");
+            if(!amt || !name) return alert("Select member and enter amount");
 
             const newRec = { name, amount: amt, type: cat, date, id: Date.now() };
             db.ref('records').push(newRec);
@@ -221,14 +215,12 @@
             alert("Record Saved!");
         }
 
-        // NEW: Delete Function
         function deleteRecord(id) {
             if(confirm("Delete this record permanently?")) {
                 db.ref('records').child(id).remove();
             }
         }
 
-        // NEW: Edit Function
         function editRecord(id, oldAmount) {
             let newAmt = prompt("Edit Amount (₱):", oldAmount);
             if(newAmt !== null && newAmt !== "") {
@@ -241,6 +233,7 @@
             const gBody = document.getElementById('giving-body');
             const mSel = document.getElementById('adm-member');
             const summary = document.getElementById('summary-display');
+            if(!gBody) return;
             
             gBody.innerHTML = ""; mSel.innerHTML = "";
             members.forEach(m => { if(!m.isAdmin) mSel.innerHTML += `<option>${m.name}</option>`; });
@@ -252,27 +245,19 @@
             visible.sort((a,b) => b.id - a.id).forEach(r => {
                 if(totals.hasOwnProperty(r.type)) totals[r.type] += r.amount;
                 
-                let row = `<tr>
-                    <td>${r.date}</td>
-                    <td>${r.type}</td>
-                    <td>${r.name}</td>
-                    <td>₱${r.amount.toLocaleString()}</td>`;
-                
+                let row = `<tr><td>${r.date}</td><td>${r.type}</td><td>${r.name}</td><td>₱${r.amount.toLocaleString()}</td>`;
                 if(currentUser && currentUser.isAdmin) {
-                    row += `<td>
+                    row += `<td class="admin-only">
                         <button class="btn-edit" onclick="editRecord('${r.firebaseKey}', ${r.amount})">Edit</button>
                         <button class="btn-del" onclick="deleteRecord('${r.firebaseKey}')">X</button>
                     </td>`;
-                } else {
-                    row += `<td></td>`;
-                }
+                } else { row += `<td></td>`; }
                 row += `</tr>`;
                 gBody.innerHTML += row;
             });
             summary.innerHTML = Object.keys(totals).map(k => `<div style="background:var(--navy); color:var(--gold); padding:5px; font-size:0.6rem; border-radius:3px;">${k}: ₱${totals[k].toLocaleString()}</div>`).join('');
         }
 
-        // --- OTHER UTILITIES ---
         function sendChat() {
             const val = document.getElementById('chat-input').value;
             if(!val) return;
@@ -282,7 +267,7 @@
 
         function renderChat() {
             const box = document.getElementById('chat-box');
-            box.innerHTML = chats.map(c => `<div class="bubble ${c.user === (currentUser?currentUser.name:'') ? 'me' : 'them'}"><b>${c.user}</b>: ${c.text}</div>`).join('');
+            box.innerHTML = chats.map(c => `<div class="bubble ${currentUser && c.user === currentUser.name ? 'me' : 'them'}"><b>${c.user}</b>: ${c.text}</div>`).join('');
             box.scrollTop = box.scrollHeight;
         }
 
@@ -297,6 +282,7 @@
             const name = document.getElementById('reg-name').value;
             const email = document.getElementById('reg-email').value;
             const pass = document.getElementById('reg-pass').value;
+            if(!name || !pass) return alert("Fill Name and Password");
             db.ref('members').push({name, email, pass, isAdmin: false});
             alert("Member Registered!");
         }
