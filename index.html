@@ -4,40 +4,33 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ADULLAM BIBLE BAPTIST CHURCH PORTAL</title>
+    
+    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-database-compat.js"></script>
+    
     <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+
     <style>
-        :root { 
-            --navy: #001f3f; --gold: #d4af37; --white: #ffffff; 
-            --danger: #e74c3c; --success: #27ae60; --gray: #f4f4f4;
-        }
-        
+        :root { --navy: #001f3f; --gold: #d4af37; --white: #ffffff; --danger: #e74c3c; --success: #27ae60; --gray: #f4f4f4; }
         body { font-family: 'Georgia', serif; margin: 0; background: var(--navy); color: #333; min-height: 100vh; padding-bottom: 50px; }
         .bg-pattern { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; background-color: var(--navy); background-image: linear-gradient(90deg, transparent 95%, rgba(212,175,55,0.05) 95%); background-size: 45px 100%; }
-
         header { background: linear-gradient(to bottom, #001f3f, #002b55); color: var(--gold); padding: 25px; text-align: center; border-bottom: 4px double var(--gold); }
         nav { background: var(--white); display: flex; justify-content: center; flex-wrap: wrap; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 10px rgba(0,0,0,0.3); }
         .nav-link { padding: 12px 15px; color: var(--navy); font-weight: bold; cursor: pointer; text-transform: uppercase; font-size: 0.7rem; }
-
         .container { max-width: 900px; margin: 20px auto; padding: 0 15px; }
         .card { background: white; padding: 20px; border-radius: 4px; margin-bottom: 20px; border: 1px solid var(--gold); box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
-        
         h3 { border-bottom: 2px solid var(--gold); padding-bottom: 5px; color: var(--navy); margin-top: 0; }
-
         table { width: 100%; border-collapse: collapse; font-size: 0.8rem; margin-top: 10px; }
         th { background: var(--gray); padding: 8px; text-align: left; border: 1px solid #ddd; }
         td { padding: 8px; border: 1px solid #ddd; }
-        
         .btn { padding: 10px; border: none; cursor: pointer; font-weight: bold; border-radius: 4px; font-size: 0.7rem; transition: 0.2s; color: white; }
         .btn-del { background: var(--danger); padding: 4px 8px; }
         .btn-tithe { background: #2c3e50; }
         .btn-offering { background: #27ae60; }
-        .btn-gold { background: var(--gold); color: var(--navy); width: 100%; margin-top: 10px; }
-
-        .chat-container { height: 250px; overflow-y: auto; border: 1px solid #ddd; padding: 10px; margin-bottom: 10px; background: #f9f9f9; display: flex; flex-direction: column; }
+        .chat-container { height: 300px; overflow-y: auto; border: 1px solid #ddd; padding: 10px; background: #f9f9f9; display: flex; flex-direction: column; }
         .bubble { margin-bottom: 8px; padding: 8px; border-radius: 8px; max-width: 80%; font-size: 0.8rem; }
         .me { align-self: flex-end; background: #dcf8c6; }
         .them { align-self: flex-start; background: #fff; border: 1px solid #eee; }
-
         input, select, textarea { width: 100%; padding: 10px; margin: 8px 0; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
         .hidden { display: none; }
     </style>
@@ -47,8 +40,7 @@
 
     <div id="auth-screen">
         <div class="card" style="max-width: 320px; margin: 80px auto; text-align: center;">
-            <h2 style="color:var(--navy); margin:0;">ADULLAM BIBLE BAPTIST CHURCH PALAUIG</h2>
-            <p style="color:var(--gold); font-weight:bold;">MEMBERS PORTAL</p>
+            <h2 style="color:var(--navy); margin:0;">ADULLAM BIBLE BAPTIST CHURCH PORTAL</h2>
             <input type="text" id="log-name" placeholder="User Name">
             <input type="password" id="log-pass" placeholder="Password">
             <button class="btn btn-tithe" style="width:100%" onclick="handleLogin()">Login</button>
@@ -57,32 +49,28 @@
 
     <div id="main-app" class="hidden">
         <header>
-            <div style="font-size: 1.5rem; font-weight: bold;">ADULLAM BIBLE BAPTIST CHURCH PALAUIG</div>
+            <div style="font-size: 1.2rem; font-weight: bold;">ADULLAM BIBLE BAPTIST CHURCH</div>
             <div id="welcome-user" style="color:white; font-size: 0.8rem;"></div>
         </header>
         
         <nav>
             <div class="nav-link" onclick="showTab('home')">Bulletin</div>
-            <div class="nav-link" onclick="showTab('giving')">My Giving</div>
-            <div class="nav-link" onclick="showTab('chat')">Chat</div>
+            <div class="nav-link" onclick="showTab('giving')">My Records</div>
+            <div class="nav-link" onclick="showTab('chat')">Fellowship Chat</div>
             <div class="nav-link admin-only" onclick="showTab('admin')">Admin Office</div>
-            <div class="nav-link" onclick="showTab('sync')">Sync</div>
             <div class="nav-link" onclick="location.reload()">Logout</div>
         </nav>
 
         <div class="container">
             <div id="tab-home" class="tab-content">
-                <div class="card">
-                    <h3>Church Announcements</h3>
-                    <div id="announcement-list"></div>
-                </div>
+                <div class="card"><h3>Announcements</h3><div id="announcement-list"></div></div>
             </div>
 
             <div id="tab-chat" class="tab-content hidden">
                 <div class="card">
-                    <h3>Brethren Fellowship Chat</h3>
+                    <h3>Group Chat</h3>
                     <div class="chat-container" id="chat-box"></div>
-                    <div style="display:flex; gap:5px;">
+                    <div style="display:flex; gap:5px; margin-top:10px;">
                         <input type="text" id="chat-input" placeholder="Type a message...">
                         <button class="btn btn-offering" onclick="sendChat()">Send</button>
                     </div>
@@ -91,8 +79,8 @@
 
             <div id="tab-giving" class="tab-content hidden">
                 <div class="card">
-                    <h3>Giving Records</h3>
-                    <button class="btn btn-offering" style="width:100%; margin-bottom:10px;" onclick="downloadCSV()">📥 Download Excel (.csv)</button>
+                    <h3>Financial Stewardship</h3>
+                    <button class="btn btn-offering" style="width:100%; margin-bottom:10px;" onclick="downloadCSV()">📥 Download Excel Report</button>
                     <div id="summary-display" style="display:flex; flex-wrap:wrap; gap:5px; margin-bottom:15px;"></div>
                     <div style="overflow-x:auto;">
                         <table>
@@ -105,11 +93,11 @@
 
             <div id="tab-admin" class="tab-content hidden">
                 <div class="card">
-                    <h3>Record New Giving</h3>
+                    <h3>Add Record</h3>
                     <select id="adm-member"></select>
                     <input type="number" id="adm-amt" placeholder="Amount (₱)">
                     <input type="date" id="adm-date">
-                    <div style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap:5px;">
+                    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:5px;">
                         <button class="btn btn-tithe" onclick="saveRecord('Tithes')">Tithes</button>
                         <button class="btn btn-offering" onclick="saveRecord('Offering')">Offering</button>
                         <button class="btn btn-tithe" style="background:#8e44ad" onclick="saveRecord('Mission')">Mission</button>
@@ -118,57 +106,68 @@
                         <button class="btn btn-tithe" style="background:#c0392b" onclick="saveRecord('Anniversary')">Anniversary</button>
                     </div>
                 </div>
-
                 <div class="card">
-                    <h3>Announcement Manager</h3>
-                    <textarea id="adm-announcement" placeholder="Post new church news..."></textarea>
-                    <button class="btn btn-gold" onclick="saveAnnouncement()">Update & Notify All Members</button>
-                </div>
-
-                <div class="card">
-                    <h3>Member Registration</h3>
-                    <input type="text" id="reg-name" placeholder="Full Name (for login)">
-                    <input type="email" id="reg-email" placeholder="Email (for notifications)">
-                    <input type="text" id="reg-pass" placeholder="Password">
-                    <button class="btn btn-offering" style="width:100%" onclick="registerMember()">Add Member</button>
+                    <h3>Admin Controls</h3>
+                    <textarea id="adm-announcement" placeholder="Post announcement..."></textarea>
+                    <button class="btn btn-offering" style="width:100%" onclick="saveAnnouncement()">Post & Email Members</button>
                     <hr>
-                    <h4>Registered Members</h4>
-                    <div id="member-list-admin" style="font-size:0.75rem;"></div>
-                </div>
-            </div>
-
-            <div id="tab-sync" class="tab-content hidden">
-                <div class="card">
-                    <h3>Sync Data</h3>
-                    <p style="font-size:0.7rem;">Paste the Admin Share Code to update your portal.</p>
-                    <textarea id="import-code" placeholder="Paste code here..."></textarea>
-                    <button class="btn btn-offering" style="width:100%" onclick="importSync()">Update My Portal</button>
-                </div>
-                <div class="card admin-only">
-                    <h3>Generate Share Code</h3>
-                    <button class="btn btn-tithe" style="width:100%" onclick="generateSync()">Get Share Code</button>
-                    <textarea id="sync-code" readonly style="font-size:0.6rem; height:50px;"></textarea>
+                    <h4>Register Member</h4>
+                    <input type="text" id="reg-name" placeholder="Name">
+                    <input type="email" id="reg-email" placeholder="Email">
+                    <input type="text" id="reg-pass" placeholder="Password">
+                    <button class="btn btn-tithe" style="width:100%" onclick="registerMember()">Add Member</button>
                 </div>
             </div>
         </div>
     </div>
 
     <script>
-        // --- EMAILJS CONFIG (Replace with your keys) ---
-        (function(){ emailjs.init("2hSBkJZQ_Xsskx-Kw"); })();
-
-        const M_KEY = "abbc_v20_m"; 
-        const R_KEY = "abbc_v20_r";
-        const C_KEY = "abbc_v20_c"; 
-        const B_KEY = "abbc_v20_b"; 
-
-        let members = JSON.parse(localStorage.getItem(M_KEY)) || [{name: 'ABBC PALAUIG', email:'abbcpalauig22@gmail.com', pass: 'abbc22', isAdmin: true}];
-        let records = JSON.parse(localStorage.getItem(R_KEY)) || [];
-        let chats = JSON.parse(localStorage.getItem(C_KEY)) || [];
-        let bulletin = localStorage.getItem(B_KEY) || "BLESSED DAY, WELCOME!";
+        // --- 2. CONFIGURATION (REPLACE THESE) ---
+        const firebaseConfig = {
+            apiKey: "AIzaSyCLY8dNKhi_nXZ5tXnnBL7vYbVNUWTMK3I",
+            databaseURL: "https://adullamportal-default-rtdb.asia-southeast1.firebasedatabase.app/",
+            projectId: "adullamportal",
+            storageBucket: "adullamportal.firebasestorage.app",
+            appId: "1:971376913220:web:00bec82a7469d2ff190511"
+        };
         
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+        emailjs.init("2hSBkJZQ_Xsskx-Kw");
+
+        let members = [];
+        let records = [];
+        let chats = [];
         let currentUser = null;
 
+        // --- 3. REAL-TIME DATA LISTENERS ---
+        // Listen for Members
+        db.ref('members').on('value', (s) => {
+            const data = s.val();
+            members = data ? Object.values(data) : [{name: 'Admin', pass: 'admin123', isAdmin: true}];
+            updateUI();
+        });
+
+        // Listen for Records
+        db.ref('records').on('value', (s) => {
+            const data = s.val();
+            records = data ? Object.values(data) : [];
+            updateUI();
+        });
+
+        // Listen for Chats
+        db.ref('chats').on('value', (s) => {
+            const data = s.val();
+            chats = data ? Object.values(data) : [];
+            renderChat();
+        });
+
+        // Listen for Bulletin
+        db.ref('bulletin').on('value', (s) => {
+            document.getElementById('announcement-list').innerText = s.val() || "Welcome!";
+        });
+
+        // --- 4. FUNCTIONS ---
         function handleLogin() {
             const n = document.getElementById('log-name').value.trim();
             const p = document.getElementById('log-pass').value.trim();
@@ -180,91 +179,28 @@
                 document.getElementById('welcome-user').innerText = `Shalom, ${user.name}`;
                 if(!user.isAdmin) document.querySelectorAll('.admin-only').forEach(e => e.classList.add('hidden'));
                 updateUI();
-            } else alert("Wrong credentials.");
-        }
-
-        function updateUI() {
-            const gBody = document.getElementById('giving-body');
-            const mSel = document.getElementById('adm-member');
-            const mList = document.getElementById('member-list-admin');
-            const summary = document.getElementById('summary-display');
-            
-            gBody.innerHTML = ""; mSel.innerHTML = ""; mList.innerHTML = "";
-            
-            members.forEach(m => {
-                if(!m.isAdmin) {
-                    mSel.innerHTML += `<option>${m.name}</option>`;
-                    mList.innerHTML += `<div>• ${m.name} (${m.email || 'No Email'})</div>`;
-                }
-            });
-
-            const cats = ["Tithes","Offering","Mission","Lot Fund","Building","Anniversary"];
-            let totals = {}; cats.forEach(c => totals[c] = 0);
-
-            const visible = records.filter(r => currentUser.isAdmin || r.name === currentUser.name);
-            visible.sort((a,b) => b.id - a.id).forEach(r => {
-                if(totals.hasOwnProperty(r.type)) totals[r.type] += r.amount;
-                gBody.innerHTML += `<tr><td>${r.date}</td><td>${r.type}</td><td>${r.name}</td><td>₱${r.amount}</td>${currentUser.isAdmin ? `<td><button class="btn btn-del" onclick="deleteRecord(${r.id})">X</button></td>` : ''}</tr>`;
-            });
-
-            summary.innerHTML = Object.keys(totals).map(k => `<div style="background:var(--navy); color:var(--gold); padding:5px; border-radius:3px; font-size:0.65rem;">${k}: ₱${totals[k]}</div>`).join('');
-            document.getElementById('announcement-list').innerText = bulletin;
-            renderChat();
+            } else alert("Invalid Login");
         }
 
         function saveRecord(cat) {
             const name = document.getElementById('adm-member').value;
             const amt = parseFloat(document.getElementById('adm-amt').value);
             const date = document.getElementById('adm-date').value || new Date().toLocaleDateString();
-            if(!amt) return alert("Input amount");
+            if(!amt) return alert("Enter amount");
 
-            records.push({id: Date.now(), date, name, type: cat, amount: amt});
-            localStorage.setItem(R_KEY, JSON.stringify(records));
-            
+            const newRec = { name, amount: amt, type: cat, date, id: Date.now() };
+            db.ref('records').push(newRec);
+
             const m = members.find(mem => mem.name === name);
-            if(m && m.email) sendEmail(m.email, "Giving Recorded", `Hi ${name}, your ${cat} of ₱${amt} was recorded on ${date}.`);
-            
-            updateUI();
-            alert("Record Saved & Member Notified.");
-        }
-
-        function registerMember() {
-            const name = document.getElementById('reg-name').value.trim();
-            const email = document.getElementById('reg-email').value.trim();
-            const pass = document.getElementById('reg-pass').value.trim();
-            if(!name || !pass) return alert("Name and Password required.");
-            members.push({name, email, pass, isAdmin: false});
-            localStorage.setItem(M_KEY, JSON.stringify(members));
-            updateUI();
-            alert("Member Registered.");
-        }
-
-        function downloadCSV() {
-            let csv = "CATEGORY,DATE,MEMBER,AMOUNT\n";
-            const cats = ["Tithes","Offering","Mission","Lot Fund","Building","Anniversary"];
-            let grand = 0;
-            cats.forEach(c => {
-                const filtered = records.filter(r => r.type === c);
-                const sub = filtered.reduce((sum, r) => sum + r.amount, 0);
-                grand += sub;
-                filtered.forEach(r => csv += `${c},${r.date},${r.name},${r.amount}\n`);
-                csv += `TOTAL ${c},,,${sub}\n\n`;
-            });
-            csv += `GRAND TOTAL,,,${grand}`;
-            const blob = new Blob([csv], {type:'text/csv'});
-            const a = document.createElement('a');
-            a.href = URL.createObjectURL(blob);
-            a.download = "Church_Report.csv";
-            a.click();
+            if(m && m.email) sendEmail(m.email, "Giving Recorded", `Hi ${name}, your ${cat} of ₱${amt} was recorded.`);
+            alert("Record Saved to Cloud!");
         }
 
         function sendChat() {
-            const msg = document.getElementById('chat-input').value;
-            if(!msg) return;
-            chats.push({user: currentUser.name, text: msg, time: new Date().toLocaleTimeString()});
-            localStorage.setItem(C_KEY, JSON.stringify(chats));
+            const val = document.getElementById('chat-input').value;
+            if(!val) return;
+            db.ref('chats').push({ user: currentUser.name, text: val, time: new Date().toLocaleTimeString() });
             document.getElementById('chat-input').value = "";
-            renderChat();
         }
 
         function renderChat() {
@@ -274,39 +210,62 @@
         }
 
         function saveAnnouncement() {
-            bulletin = document.getElementById('adm-announcement').value;
-            localStorage.setItem(B_KEY, bulletin);
-            members.forEach(m => { if(m.email) sendEmail(m.email, "Church Announcement", bulletin); });
-            alert("Updated & Notified via Email.");
-            updateUI();
+            const txt = document.getElementById('adm-announcement').value;
+            db.ref('bulletin').set(txt);
+            members.forEach(m => { if(m.email) sendEmail(m.email, "Church Announcement", txt); });
+            alert("Announcement Updated!");
+        }
+
+        function registerMember() {
+            const name = document.getElementById('reg-name').value;
+            const email = document.getElementById('reg-email').value;
+            const pass = document.getElementById('reg-pass').value;
+            db.ref('members').push({name, email, pass, isAdmin: false});
+            alert("Member Registered!");
+        }
+
+        function updateUI() {
+            const gBody = document.getElementById('giving-body');
+            const mSel = document.getElementById('adm-member');
+            const summary = document.getElementById('summary-display');
+            
+            gBody.innerHTML = ""; mSel.innerHTML = "";
+            members.forEach(m => { if(!m.isAdmin) mSel.innerHTML += `<option>${m.name}</option>`; });
+
+            const cats = ["Tithes","Offering","Mission","Lot Fund","Building","Anniversary"];
+            let totals = {}; cats.forEach(c => totals[c] = 0);
+
+            const visible = records.filter(r => currentUser.isAdmin || r.name === currentUser.name);
+            visible.sort((a,b) => b.id - a.id).forEach(r => {
+                if(totals.hasOwnProperty(r.type)) totals[r.type] += r.amount;
+                gBody.innerHTML += `<tr><td>${r.date}</td><td>${r.type}</td><td>${r.name}</td><td>₱${r.amount}</td></tr>`;
+            });
+            summary.innerHTML = Object.keys(totals).map(k => `<div style="background:var(--navy); color:var(--gold); padding:5px; font-size:0.6rem;">${k}: ₱${totals[k]}</div>`).join('');
         }
 
         function sendEmail(to, sub, msg) {
             emailjs.send("service_abbcpalauig", "template_91rrfki", {to_email: to, subject: sub, message: msg});
         }
 
-        function generateSync() {
-            const data = btoa(unescape(encodeURIComponent(JSON.stringify({m:members, r:records, c:chats, b:bulletin}))));
-            document.getElementById('sync-code').value = data;
-        }
-
-        function importSync() {
-            try {
-                const data = JSON.parse(decodeURIComponent(escape(atob(document.getElementById('import-code').value.trim()))));
-                localStorage.setItem(M_KEY, JSON.stringify(data.m));
-                localStorage.setItem(R_KEY, JSON.stringify(data.r));
-                localStorage.setItem(C_KEY, JSON.stringify(data.c));
-                localStorage.setItem(B_KEY, data.b);
-                alert("Synced!"); location.reload();
-            } catch(e) { alert("Invalid Code"); }
+        function downloadCSV() {
+            let csv = "CATEGORY,DATE,MEMBER,AMOUNT\n";
+            const cats = ["Tithes","Offering","Mission","Lot Fund","Building","Anniversary"];
+            cats.forEach(c => {
+                const items = records.filter(r => r.type === c);
+                items.forEach(i => csv += `${c},${i.date},${i.name},${i.amount}\n`);
+                csv += `TOTAL ${c},,,${items.reduce((s,r)=>s+r.amount,0)}\n\n`;
+            });
+            const blob = new Blob([csv], {type:'text/csv'});
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = "Church_Records.csv";
+            a.click();
         }
 
         function showTab(t) {
             document.querySelectorAll('.tab-content').forEach(c => c.classList.add('hidden'));
             document.getElementById('tab-'+t).classList.remove('hidden');
         }
-
-        function deleteRecord(id) { if(confirm("Delete?")) { records = records.filter(r => r.id !== id); localStorage.setItem(R_KEY, JSON.stringify(records)); updateUI(); }}
     </script>
 </body>
 </html>
