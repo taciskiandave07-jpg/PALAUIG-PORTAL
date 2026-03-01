@@ -176,7 +176,6 @@ input[type="file"] { padding: 5px; background: #eee; font-size: 0.7rem; }
 </div>
 
 <script>
-// --- CONFIGURATION ---
 const firebaseConfig = {
     apiKey: "AIzaSyCLY8dNKhi_nXZ5tXnnBL7vYbVNUWTMK3I",
     databaseURL: "https://adullamportal-default-rtdb.asia-southeast1.firebasedatabase.app/",
@@ -194,7 +193,6 @@ let records = [];
 let chats = [];
 let currentUser = null;
 
-// --- GALLERY & LOGO HANDLING ---
 function uploadLogo() {
     const file = document.getElementById('logo-file-input').files[0];
     if(!file) return alert("Select an image first");
@@ -218,7 +216,6 @@ function uploadProfilePic() {
     reader.readAsDataURL(file);
 }
 
-// --- DATA LISTENERS ---
 db.ref('settings/logo').on('value', (s) => {
     const url = s.val();
     if(url) {
@@ -236,7 +233,7 @@ db.ref('members').on('value', (s) => {
             const updated = members.find(m => m.firebaseKey === currentUser.firebaseKey);
             if(updated) currentUser = updated;
         }
-    } else { members = [{name: 'Admin', pass: 'admin123', isAdmin: true}]; }
+    } else { members = [{name: 'ABBC ADMIN', pass: 'abbc22', isAdmin: true}]; }
     updateUI();
 });
 
@@ -256,7 +253,6 @@ db.ref('bulletin').on('value', (s) => {
     document.getElementById('announcement-list').innerText = s.val() || "Welcome!";
 });
 
-// --- CORE FUNCTIONS ---
 function handleLogin() {
     const n = document.getElementById('log-name').value.trim();
     const p = document.getElementById('log-pass').value.trim();
@@ -337,14 +333,16 @@ function updateUI() {
 
     visible.sort((a,b) => b.id - a.id).forEach(r => {
         if(totals.hasOwnProperty(r.type)) totals[r.type] += r.amount;
-        let statusHtml = "N/A";
+        let statusHtml = "RECORDED";
         const mData = members.find(m => m.name === r.name);
+        
         if (mData && mData.commitments && mData.commitments[r.type]) {
             const target = mData.commitments[r.type];
             const d = new Date(r.date);
             const monthlyTotal = records.filter(rec => rec.name === r.name && rec.type === r.type && new Date(rec.date).getMonth() === d.getMonth()).reduce((s, rec) => s + rec.amount, 0);
-            statusHtml = monthlyTotal >= target ? `<span class="status-paid">PAID</span>` : `<span class="status-missing">MISSING (₱${target - monthlyTotal})</span>`;
+            statusHtml = monthlyTotal >= target ? `<span class="status-paid">PAID</span>` : `<span class="status-missing">MISSING (₱${(target - monthlyTotal).toLocaleString()})</span>`;
         }
+        
         let row = `<tr><td>${r.date}</td><td>${r.type}</td><td>${r.name}</td><td>₱${r.amount.toLocaleString()}</td><td>${statusHtml}</td>`;
         if(currentUser && currentUser.isAdmin) {
             row += `<td><button class="btn-edit" onclick="editRecord('${r.firebaseKey}', ${r.amount})">Edit</button><button class="btn-del" onclick="deleteRecord('${r.firebaseKey}')">X</button></td>`;
@@ -354,7 +352,7 @@ function updateUI() {
     summary.innerHTML = Object.keys(totals).map(k => `<div style="background:var(--navy); color:var(--gold); padding:5px; font-size:0.6rem; border-radius:3px;">${k}: ₱${totals[k].toLocaleString()}</div>`).join('');
 }
 
-// --- ADVANCED EXCEL EXPORT ---
+// --- UPDATED EXCEL EXPORT ---
 function downloadCSV() {
     if (records.length === 0) return alert("No records found.");
     const cats = ["Tithes", "Offering", "Mission", "Lot Fund", "Building", "Anniversary"];
@@ -365,62 +363,64 @@ function downloadCSV() {
     if(fromDate) visible = visible.filter(r => r.date >= fromDate);
     if(toDate) visible = visible.filter(r => r.date <= toDate);
 
-    // Section 1: Member Summary
-    let csv = "--- SUMMARY BY MEMBER ---\n";
-    csv += "Member Name," + cats.join(",") + ",OVERALL STATUS\n";
+    // CSV Header with individual columns
+    let csv = "Date,Member Name," + cats.join(",") + ",Total Given,Status\n";
+    
+    let grandTotal = 0;
+    let categorySums = { "Tithes": 0, "Offering": 0, "Mission": 0, "Lot Fund": 0, "Building": 0, "Anniversary": 0 };
 
-    const uniqueNames = [...new Set(visible.map(r => r.name))];
-    uniqueNames.forEach(name => {
-        let row = [name];
-        let isMissingAny = false;
-        const mData = members.find(m => m.name === name);
+    visible.forEach(r => {
+        let row = [r.date, r.name];
+        let totalForRow = 0;
+        let status = "RECORDED";
+
+        // Fill individual category columns
         cats.forEach(c => {
-            const total = visible.filter(r => r.name === name && r.type === c).reduce((s, r) => s + r.amount, 0);
-            row.push(total);
-            if (mData && mData.commitments && mData.commitments[c]) {
-                if (total < mData.commitments[c]) isMissingAny = true;
+            if (r.type === c) {
+                row.push(r.amount);
+                categorySums[c] += r.amount;
+                totalForRow += r.amount;
+                grandTotal += r.amount;
+
+                // Check goal status for Mission, Lot, Building, Anniversary
+                const mData = members.find(m => m.name === r.name);
+                if (mData && mData.commitments && mData.commitments[c]) {
+                    const goal = mData.commitments[c];
+                    // Calculate total given by this member for this category in this specific month
+                    const currentMonth = new Date(r.date).getMonth();
+                    const currentYear = new Date(r.date).getFullYear();
+                    
+                    const monthlyTotal = records.filter(rec => {
+                        const d = new Date(rec.date);
+                        return rec.name === r.name && rec.type === c && d.getMonth() === currentMonth && d.getFullYear() === currentYear;
+                    }).reduce((sum, rec) => sum + rec.amount, 0);
+
+                    status = monthlyTotal >= goal ? "PAID" : "MISSING";
+                }
+            } else {
+                row.push(0);
             }
         });
-        row.push(isMissingAny ? "MISSING" : "PAID");
+
+        row.push(totalForRow);
+        row.push(status);
         csv += row.join(",") + "\n";
     });
 
-    // Section 2: Detailed Log
-    csv += "\n\n--- DETAILED TRANSACTION LOG ---\n";
-    csv += "Date,Member," + cats.join(",") + ",Record Status\n";
-    let catTotals = { "Tithes": 0, "Offering": 0, "Mission": 0, "Lot Fund": 0, "Building": 0, "Anniversary": 0 };
-
-    visible.forEach(r => {
-        let rowData = [r.date, r.name];
-        let recordStatus = "N/A";
-        cats.forEach(c => {
-            if(r.type === c) {
-                rowData.push(r.amount);
-                catTotals[c] += r.amount;
-                const mData = members.find(m => m.name === r.name);
-                if (mData && mData.commitments && mData.commitments[c]) {
-                    const monthlyTotal = records.filter(rec => rec.name === r.name && rec.type === c && new Date(rec.date).getMonth() === new Date(r.date).getMonth()).reduce((s, rec) => s + rec.amount, 0);
-                    recordStatus = monthlyTotal >= mData.commitments[c] ? "PAID" : "MISSING";
-                }
-            } else { rowData.push(0); }
-        });
-        rowData.push(recordStatus);
-        csv += rowData.join(",") + "\n";
-    });
-
-    let totalRow = ["TOTALS", "ALL ENTRIES"];
-    cats.forEach(c => totalRow.push(catTotals[c]));
-    totalRow.push("");
-    csv += "\n" + totalRow.join(",");
+    // Individual Sums Row
+    let sumRow = ["TOTALS", "ALL MEMBERS"];
+    cats.forEach(c => sumRow.push(categorySums[c]));
+    sumRow.push(grandTotal);
+    sumRow.push("---");
+    csv += "\n" + sumRow.join(",");
 
     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
     const a = document.createElement("a");
     a.href = URL.createObjectURL(blob);
-    a.download = `ABBC_Export_${new Date().toLocaleDateString()}.csv`;
+    a.download = `ABBC_Financial_Report_${new Date().toISOString().split('T')[0]}.csv`;
     a.click();
 }
 
-// --- UTILS ---
 function sendChat() { 
     const v = document.getElementById('chat-input').value; 
     if(!v) return;
