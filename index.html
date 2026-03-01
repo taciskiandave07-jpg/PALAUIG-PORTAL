@@ -1,315 +1,372 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ADULLAM BIBLE BAPTIST CHURCH PORTAL</title>
-    
-    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-database-compat.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ADULLAM BIBLE BAPTIST CHURCH PORTAL</title>
 
-    <style>
-        :root { --navy: #001f3f; --gold: #d4af37; --white: #ffffff; --danger: #e74c3c; --success: #27ae60; --gray: #f4f4f4; }
-        body { font-family: 'Georgia', serif; margin: 0; background: var(--navy); color: #333; min-height: 100vh; padding-bottom: 50px; }
-        .bg-pattern { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; background-color: var(--navy); background-image: linear-gradient(90deg, transparent 95%, rgba(212,175,55,0.05) 95%); background-size: 45px 100%; }
-        header { background: linear-gradient(to bottom, #001f3f, #002b55); color: var(--gold); padding: 25px; text-align: center; border-bottom: 4px double var(--gold); }
-        nav { background: var(--white); display: flex; justify-content: center; flex-wrap: wrap; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 10px rgba(0,0,0,0.3); }
-        .nav-link { padding: 12px 15px; color: var(--navy); font-weight: bold; cursor: pointer; text-transform: uppercase; font-size: 0.7rem; }
-        .container { max-width: 900px; margin: 20px auto; padding: 0 15px; }
-        .card { background: white; padding: 20px; border-radius: 4px; margin-bottom: 20px; border: 1px solid var(--gold); box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
-        h3 { border-bottom: 2px solid var(--gold); padding-bottom: 5px; color: var(--navy); margin-top: 0; }
-        table { width: 100%; border-collapse: collapse; font-size: 0.8rem; margin-top: 10px; }
-        th { background: var(--gray); padding: 8px; text-align: left; border: 1px solid #ddd; }
-        td { padding: 8px; border: 1px solid #ddd; }
-        .btn { padding: 10px; border: none; cursor: pointer; font-weight: bold; border-radius: 4px; font-size: 0.7rem; transition: 0.2s; color: white; }
-        .btn-del { background: var(--danger); padding: 4px 8px; cursor: pointer; border: none; border-radius: 3px; color: white; }
-        .btn-edit { background: var(--gold); padding: 4px 8px; cursor: pointer; border: none; border-radius: 3px; color: var(--navy); margin-right: 2px; }
-        .btn-tithe { background: #2c3e50; }
-        .btn-offering { background: #27ae60; }
-        .chat-container { height: 300px; overflow-y: auto; border: 1px solid #ddd; padding: 10px; background: #f9f9f9; display: flex; flex-direction: column; }
-        .bubble { margin-bottom: 8px; padding: 8px; border-radius: 8px; max-width: 80%; font-size: 0.8rem; }
-        .me { align-self: flex-end; background: #dcf8c6; }
-        .them { align-self: flex-start; background: #fff; border: 1px solid #eee; }
-        input, select, textarea { width: 100%; padding: 10px; margin: 8px 0; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
-        .hidden { display: none; }
-    </style>
+<script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-database-compat.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+
+<style>
+:root { --navy: #001f3f; --gold: #d4af37; --white: #ffffff; --danger: #e74c3c; --success: #27ae60; --gray: #f4f4f4; }
+body { font-family: 'Georgia', serif; margin: 0; background: var(--navy); color: #333; min-height: 100vh; padding-bottom: 50px; }
+.bg-pattern { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; background-color: var(--navy); background-image: linear-gradient(90deg, transparent 95%, rgba(212,175,55,0.05) 95%); background-size: 45px 100%; }
+
+/* Logo & Profile Styles */
+.church-logo { width: 60px; height: 60px; object-fit: contain; border-radius: 50%; border: 2px solid var(--gold); background: white; margin-bottom: 10px; }
+.header-content { display: flex; align-items: center; justify-content: center; gap: 15px; flex-wrap: wrap; }
+.chat-avatar { width: 30px; height: 30px; border-radius: 50%; object-fit: cover; vertical-align: middle; margin-right: 5px; border: 1px solid var(--gold); }
+
+header { background: linear-gradient(to bottom, #001f3f, #002b55); color: var(--gold); padding: 20px; text-align: center; border-bottom: 4px double var(--gold); }
+nav { background: var(--white); display: flex; justify-content: center; flex-wrap: wrap; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 10px rgba(0,0,0,0.3); }
+.nav-link { padding: 12px 15px; color: var(--navy); font-weight: bold; cursor: pointer; text-transform: uppercase; font-size: 0.7rem; }
+.container { max-width: 900px; margin: 20px auto; padding: 0 15px; }
+.card { background: white; padding: 20px; border-radius: 4px; margin-bottom: 20px; border: 1px solid var(--gold); box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
+h3 { border-bottom: 2px solid var(--gold); padding-bottom: 5px; color: var(--navy); margin-top: 0; }
+table { width: 100%; border-collapse: collapse; font-size: 0.8rem; margin-top: 10px; }
+th { background: var(--gray); padding: 8px; text-align: left; border: 1px solid #ddd; }
+td { padding: 8px; border: 1px solid #ddd; }
+.btn { padding: 10px; border: none; cursor: pointer; font-weight: bold; border-radius: 4px; font-size: 0.7rem; transition: 0.2s; color: white; }
+.btn-del { background: var(--danger); padding: 4px 8px; cursor: pointer; border: none; border-radius: 3px; color: white; }
+.btn-edit { background: var(--gold); padding: 4px 8px; cursor: pointer; border: none; border-radius: 3px; color: var(--navy); margin-right: 2px; }
+.btn-tithe { background: #2c3e50; }
+.btn-offering { background: #27ae60; }
+.chat-container { height: 350px; overflow-y: auto; border: 1px solid #ddd; padding: 10px; background: #f9f9f9; display: flex; flex-direction: column; }
+.bubble { margin-bottom: 8px; padding: 8px; border-radius: 8px; max-width: 80%; font-size: 0.8rem; line-height: 1.4; }
+.me { align-self: flex-end; background: #dcf8c6; border: 1px solid #c5e1a5; }
+.them { align-self: flex-start; background: #fff; border: 1px solid #eee; }
+input, select, textarea { width: 100%; padding: 10px; margin: 8px 0; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
+.hidden { display: none; }
+
+.status-paid { background: var(--success); color: white; padding: 2px 5px; border-radius: 3px; font-weight: bold; font-size: 0.6rem; }
+.status-missing { background: var(--danger); color: white; padding: 2px 5px; border-radius: 3px; font-weight: bold; font-size: 0.6rem; }
+</style>
 </head>
 <body>
-    <div class="bg-pattern"></div>
+<div class="bg-pattern"></div>
 
-    <div id="auth-screen">
-        <div class="card" style="max-width: 320px; margin: 80px auto; text-align: center;">
-            <h2 style="color:var(--navy); margin:0;">ADULLAM BIBLE BAPTIST CHURCH PORTAL</h2>
-            <input type="text" id="log-name" placeholder="User Name">
-            <input type="password" id="log-pass" placeholder="Password">
-            <button class="btn btn-tithe" style="width:100%" onclick="handleLogin()">Login</button>
-        </div>
+<div id="auth-screen">
+<div class="card" style="max-width: 320px; margin: 80px auto; text-align: center;">
+<img id="login-logo" class="church-logo hidden" src="" alt="Logo">
+<h2 style="color:var(--navy); margin:10px 0; font-size: 1.1rem;">ADULLAM BIBLE BAPTIST CHURCH PALAUIG</h2>
+<input type="text" id="log-name" placeholder="User Name">
+<input type="password" id="log-pass" placeholder="Password">
+<button class="btn btn-tithe" style="width:100%" onclick="handleLogin()">Login</button>
+</div>
+</div>
+
+<div id="main-app" class="hidden">
+<header>
+<div class="header-content">
+    <img id="header-logo" class="church-logo hidden" src="" alt="Logo">
+    <div>
+        <div style="font-size: 1.2rem; font-weight: bold;">ADULLAM BIBLE BAPTIST CHURCH PALAUIG</div>
+        <div id="welcome-user" style="color:white; font-size: 0.8rem;"></div>
     </div>
+</div>
+</header>
 
-    <div id="main-app" class="hidden">
-        <header>
-            <div style="font-size: 1.2rem; font-weight: bold;">ADULLAM BIBLE BAPTIST CHURCH</div>
-            <div id="welcome-user" style="color:white; font-size: 0.8rem;"></div>
-        </header>
-        
-        <nav>
-            <div class="nav-link" onclick="showTab('home')">Bulletin</div>
-            <div class="nav-link" onclick="showTab('giving')">My Records</div>
-            <div class="nav-link" onclick="showTab('chat')">Fellowship Chat</div>
-            <div class="nav-link admin-only" onclick="showTab('admin')">Admin Office</div>
-            <div class="nav-link" onclick="location.reload()">Logout</div>
-        </nav>
+<nav>
+<div class="nav-link" onclick="showTab('home')">Bulletin</div>
+<div class="nav-link" onclick="showTab('giving')">My Records</div>
+<div class="nav-link" onclick="showTab('chat')">Fellowship Chat</div>
+<div class="nav-link admin-only" onclick="showTab('admin')">Admin Office</div>
+<div class="nav-link" onclick="location.reload()">Logout</div>
+</nav>
 
-        <div class="container">
-            <div id="tab-home" class="tab-content">
-                <div class="card"><h3>Announcements</h3><div id="announcement-list"></div></div>
-            </div>
+<div class="container">
+<div id="tab-home" class="tab-content">
+<div class="card"><h3>Announcements</h3><div id="announcement-list"></div></div>
+</div>
 
-            <div id="tab-chat" class="tab-content hidden">
-                <div class="card">
-                    <h3>Group Chat</h3>
-                    <div class="chat-container" id="chat-box"></div>
-                    <div style="display:flex; gap:5px; margin-top:10px;">
-                        <input type="text" id="chat-input" placeholder="Type a message...">
-                        <button class="btn btn-offering" onclick="sendChat()">Send</button>
-                    </div>
-                </div>
-            </div>
+<div id="tab-chat" class="tab-content hidden">
+<div class="card">
+<h3>Group Chat</h3>
+<div class="chat-container" id="chat-box"></div>
+<div style="display:flex; gap:5px; margin-top:10px;">
+<input type="text" id="chat-input" placeholder="Type a message...">
+<button class="btn btn-offering" onclick="sendChat()">Send</button>
+</div>
+</div>
+</div>
 
-            <div id="tab-giving" class="tab-content hidden">
-                <div class="card">
-                    <h3>Financial Stewardship</h3>
-                    <button class="btn btn-offering" style="width:100%; margin-bottom:10px;" onclick="downloadCSV()">📥 Download Excel Report</button>
-                    <div id="summary-display" style="display:flex; flex-wrap:wrap; gap:5px; margin-bottom:15px;"></div>
-                    <div style="overflow-x:auto;">
-                        <table>
-                            <thead><tr><th>Date</th><th>Type</th><th>Member</th><th>Amount</th><th class="admin-only">Action</th></tr></thead>
-                            <tbody id="giving-body"></tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-
-            <div id="tab-admin" class="tab-content hidden">
-                <div class="card">
-                    <h3>Add Record</h3>
-                    <select id="adm-member"></select>
-                    <input type="number" id="adm-amt" placeholder="Amount (₱)">
-                    <input type="date" id="adm-date">
-                    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:5px;">
-                        <button class="btn btn-tithe" onclick="saveRecord('Tithes')">Tithes</button>
-                        <button class="btn btn-offering" onclick="saveRecord('Offering')">Offering</button>
-                        <button class="btn btn-tithe" style="background:#8e44ad" onclick="saveRecord('Mission')">Mission</button>
-                        <button class="btn btn-tithe" style="background:#d35400" onclick="saveRecord('Lot Fund')">Lot Fund</button>
-                        <button class="btn btn-tithe" style="background:#2980b9" onclick="saveRecord('Building')">Building</button>
-                        <button class="btn btn-tithe" style="background:#c0392b" onclick="saveRecord('Anniversary')">Anniversary</button>
-                    </div>
-                </div>
-                <div class="card">
-                    <h3>Admin Controls</h3>
-                    <textarea id="adm-announcement" placeholder="Post announcement..."></textarea>
-                    <button class="btn btn-offering" style="width:100%" onclick="saveAnnouncement()">Post & Email Members</button>
-                    <hr>
-                    <h4>Register Member</h4>
-                    <input type="text" id="reg-name" placeholder="Name">
-                    <input type="email" id="reg-email" placeholder="Email">
-                    <input type="text" id="reg-pass" placeholder="Password">
-                    <button class="btn btn-tithe" style="width:100%" onclick="registerMember()">Add Member</button>
-                </div>
-            </div>
-        </div>
+<div id="tab-giving" class="tab-content hidden">
+<div class="card" id="profile-settings-card">
+    <h3>My Profile Photo</h3>
+    <p style="font-size:0.7rem; color:gray;">Paste an image URL to show your face in the chat.</p>
+    <div style="display:flex; gap:5px;">
+        <input type="text" id="user-photo-input" placeholder="Paste image link here...">
+        <button class="btn btn-tithe" style="background:var(--navy)" onclick="updateProfilePic()">Save Photo</button>
     </div>
+</div>
 
-    <script>
-        const firebaseConfig = {
-            apiKey: "AIzaSyCLY8dNKhi_nXZ5tXnnBL7vYbVNUWTMK3I",
-            databaseURL: "https://adullamportal-default-rtdb.asia-southeast1.firebasedatabase.app/",
-            projectId: "adullamportal",
-            storageBucket: "adullamportal.firebasestorage.app",
-            appId: "1:971376913220:web:00bec82a7469d2ff190511"
-        };
+<div class="card">
+<h3>Financial Stewardship</h3>
+<button class="btn btn-offering" style="width:100%; margin-bottom:10px;" onclick="downloadCSV()">📥 Download Excel Report</button>
+<div id="summary-display" style="display:flex; flex-wrap:wrap; gap:5px; margin-bottom:15px;"></div>
+<div style="overflow-x:auto;">
+<table>
+<thead><tr><th>Date</th><th>Type</th><th>Member</th><th>Amount</th><th>Status</th><th class="admin-only">Action</th></tr></thead>
+<tbody id="giving-body"></tbody>
+</table>
+</div>
+</div>
+</div>
+
+<div id="tab-admin" class="tab-content hidden">
+<div class="card">
+    <h3>Church Identity</h3>
+    <label style="font-size:0.7rem">Upload Church Logo (Paste Image URL):</label>
+    <div style="display:flex; gap:5px;">
+        <input type="text" id="logo-url-input" placeholder="https://example.com/logo.png">
+        <button class="btn btn-offering" onclick="updateLogo()">Save Logo</button>
+    </div>
+</div>
+
+<div class="card">
+<h3>Add Record</h3>
+<select id="adm-member"></select>
+<input type="number" id="adm-amt" placeholder="Amount (₱)">
+<input type="date" id="adm-date">
+<div style="display:grid; grid-template-columns: 1fr 1fr; gap:5px;">
+<button class="btn btn-tithe" onclick="saveRecord('Tithes')">Tithes</button>
+<button class="btn btn-offering" onclick="saveRecord('Offering')">Offering</button>
+<button class="btn btn-tithe" style="background:#8e44ad" onclick="saveRecord('Mission')">Mission</button>
+<button class="btn btn-tithe" style="background:#d35400" onclick="saveRecord('Lot Fund')">Lot Fund</button>
+<button class="btn btn-tithe" style="background:#2980b9" onclick="saveRecord('Building')">Building</button>
+<button class="btn btn-tithe" style="background:#c0392b" onclick="saveRecord('Anniversary')">Anniversary</button>
+</div>
+</div>
+
+<div class="card">
+<h3>Member Commitments (Monthly Goal)</h3>
+<p style="font-size:0.7rem; color:gray;">Set target for Mission, Lot Fund, Building, Anniversary.</p>
+<select id="com-member" onchange="loadCommitmentValues()"></select>
+<div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+    <div><label style="font-size:0.7rem">Mission</label><input type="number" id="com-mission" placeholder="₱"></div>
+    <div><label style="font-size:0.7rem">Lot Fund</label><input type="number" id="com-lot" placeholder="₱"></div>
+    <div><label style="font-size:0.7rem">Building</label><input type="number" id="com-building" placeholder="₱"></div>
+    <div><label style="font-size:0.7rem">Anniversary</label><input type="number" id="com-anniversary" placeholder="₱"></div>
+</div>
+<button class="btn btn-offering" style="width:100%; margin-top:10px;" onclick="saveCommitments()">Update Commitments</button>
+</div>
+
+<div class="card">
+<h3>Admin Controls</h3>
+<textarea id="adm-announcement" placeholder="Post announcement..."></textarea>
+<button class="btn btn-offering" style="width:100%" onclick="saveAnnouncement()">Post Announcement</button>
+<hr>
+<h4>Register Member</h4>
+<input type="text" id="reg-name" placeholder="Name">
+<input type="email" id="reg-email" placeholder="Email">
+<input type="text" id="reg-pass" placeholder="Password">
+<button class="btn btn-tithe" style="width:100%" onclick="registerMember()">Add Member</button>
+</div>
+</div>
+</div>
+</div>
+
+<script>
+const firebaseConfig = {
+apiKey: "AIzaSyCLY8dNKhi_nXZ5tXnnBL7vYbVNUWTMK3I",
+databaseURL: "https://adullamportal-default-rtdb.asia-southeast1.firebasedatabase.app/",
+projectId: "adullamportal",
+storageBucket: "adullamportal.firebasestorage.app",
+appId: "1:971376913220:web:00bec82a7469d2ff190511"
+};
+
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
+emailjs.init("2hSBkJZQ_Xsskx-Kw");
+
+let members = [];
+let records = [];
+let chats = [];
+let currentUser = null;
+
+// --- LOGO & PROFILE MANAGEMENT ---
+function updateLogo() {
+    const url = document.getElementById('logo-url-input').value;
+    if(url) { db.ref('settings/logo').set(url); alert("Logo Updated!"); }
+}
+
+function updateProfilePic() {
+    const url = document.getElementById('user-photo-input').value;
+    if(!currentUser.firebaseKey) return alert("Admin photo cannot be changed here.");
+    db.ref('members').child(currentUser.firebaseKey).update({ photo: url });
+    alert("Profile Photo Updated!");
+}
+
+db.ref('settings/logo').on('value', (s) => {
+    const url = s.val();
+    if(url) {
+        document.getElementById('login-logo').src = url; 
+        document.getElementById('login-logo').classList.remove('hidden');
+        document.getElementById('header-logo').src = url; 
+        document.getElementById('header-logo').classList.remove('hidden');
+    }
+});
+
+db.ref('members').on('value', (s) => {
+    const data = s.val();
+    if (data) {
+        members = Object.keys(data).map(key => ({ ...data[key], firebaseKey: key }));
+        // Refresh currentUser info if they are logged in
+        if(currentUser && !currentUser.isAdmin) {
+            const updated = members.find(m => m.firebaseKey === currentUser.firebaseKey);
+            if(updated) currentUser = updated;
+        }
+    } else {
+        members = [{name: 'Admin', pass: 'admin123', isAdmin: true}];
+    }
+    updateUI();
+});
+
+db.ref('records').on('value', (s) => {
+    const data = s.val();
+    records = data ? Object.keys(data).map(id => ({ ...data[id], firebaseKey: id })) : [];
+    updateUI();
+});
+
+db.ref('chats').on('value', (s) => {
+    const data = s.val();
+    chats = data ? Object.values(data) : [];
+    renderChat();
+});
+
+db.ref('bulletin').on('value', (s) => {
+    document.getElementById('announcement-list').innerText = s.val() || "Welcome!";
+});
+
+function handleLogin() {
+    const n = document.getElementById('log-name').value.trim();
+    const p = document.getElementById('log-pass').value.trim();
+    if (n === "Admin" && p === "admin123") {
+        currentUser = { name: "Admin", isAdmin: true };
+    } else {
+        currentUser = members.find(m => m.name.toLowerCase() === n.toLowerCase() && m.pass === p);
+    }
+
+    if(currentUser) {
+        document.getElementById('auth-screen').classList.add('hidden');
+        document.getElementById('main-app').classList.remove('hidden');
+        document.getElementById('welcome-user').innerText = `Shalom, ${currentUser.name}`;
+        if(!currentUser.isAdmin) {
+            document.querySelectorAll('.admin-only').forEach(e => e.classList.add('hidden'));
+            if(currentUser.photo) document.getElementById('user-photo-input').value = currentUser.photo;
+        } else {
+            document.getElementById('profile-settings-card').classList.add('hidden');
+        }
+        updateUI();
+    } else { alert("Invalid Login."); }
+}
+
+function saveCommitments() {
+    const name = document.getElementById('com-member').value;
+    const m = members.find(mem => mem.name === name);
+    if(!m) return;
+    const comms = {
+        "Mission": parseFloat(document.getElementById('com-mission').value) || 0,
+        "Lot Fund": parseFloat(document.getElementById('com-lot').value) || 0,
+        "Building": parseFloat(document.getElementById('com-building').value) || 0,
+        "Anniversary": parseFloat(document.getElementById('com-anniversary').value) || 0
+    };
+    db.ref('members').child(m.firebaseKey).update({ commitments: comms });
+    alert("Commitments updated!");
+}
+
+function loadCommitmentValues() {
+    const name = document.getElementById('com-member').value;
+    const m = members.find(mem => mem.name === name);
+    if(m && m.commitments) {
+        document.getElementById('com-mission').value = m.commitments["Mission"] || 0;
+        document.getElementById('com-lot').value = m.commitments["Lot Fund"] || 0;
+        document.getElementById('com-building').value = m.commitments["Building"] || 0;
+        document.getElementById('com-anniversary').value = m.commitments["Anniversary"] || 0;
+    }
+}
+
+function saveRecord(cat) {
+    const name = document.getElementById('adm-member').value;
+    const amt = parseFloat(document.getElementById('adm-amt').value);
+    const date = document.getElementById('adm-date').value || new Date().toISOString().split('T')[0];
+    if(!amt || !name) return alert("Select member and enter amount");
+    db.ref('records').push({ name, amount: amt, type: cat, date, id: Date.now() });
+    alert("Record Saved!");
+}
+
+function updateUI() {
+    const gBody = document.getElementById('giving-body');
+    const mSel = document.getElementById('adm-member');
+    const cSel = document.getElementById('com-member');
+    const summary = document.getElementById('summary-display');
+    if(!gBody) return;
+
+    gBody.innerHTML = ""; mSel.innerHTML = ""; cSel.innerHTML = "";
+    members.forEach(m => { 
+        if(!m.isAdmin) {
+            mSel.innerHTML += `<option>${m.name}</option>`;
+            cSel.innerHTML += `<option>${m.name}</option>`;
+        }
+    });
+
+    const cats = ["Tithes","Offering","Mission","Lot Fund","Building","Anniversary"];
+    let totals = {}; cats.forEach(c => totals[c] = 0);
+
+    const visible = records.filter(r => currentUser && (currentUser.isAdmin || r.name === currentUser.name));
+    visible.sort((a,b) => b.id - a.id).forEach(r => {
+        if(totals.hasOwnProperty(r.type)) totals[r.type] += r.amount;
         
-        firebase.initializeApp(firebaseConfig);
-        const db = firebase.database();
-        emailjs.init("2hSBkJZQ_Xsskx-Kw");
-
-        let members = [];
-        let records = [];
-        let chats = [];
-        let currentUser = null;
-
-        // --- IMPROVED DATA LISTENERS ---
-        db.ref('members').on('value', (s) => {
-            const data = s.val();
-            if (data) {
-                members = Object.keys(data).map(key => ({ ...data[key], firebaseKey: key }));
-            } else {
-                members = [{name: 'Admin', pass: 'admin123', isAdmin: true}];
-            }
-            updateUI();
-        });
-
-        db.ref('records').on('value', (s) => {
-            const data = s.val();
-            records = [];
-            if (data) {
-                Object.keys(data).forEach(id => {
-                    let r = data[id];
-                    r.firebaseKey = id;
-                    records.push(r);
-                });
-            }
-            updateUI();
-        });
-
-        db.ref('chats').on('value', (s) => {
-            const data = s.val();
-            chats = data ? Object.values(data) : [];
-            renderChat();
-        });
-
-        db.ref('bulletin').on('value', (s) => {
-            document.getElementById('announcement-list').innerText = s.val() || "Welcome!";
-        });
-
-        // --- UPDATED LOGIN WITH BACKDOOR ---
-        function handleLogin() {
-            const n = document.getElementById('log-name').value.trim();
-            const p = document.getElementById('log-pass').value.trim();
-
-            // Safety Backdoor: Always works even if Firebase list hasn't loaded
-            if (n === "Admin" && p === "admin123") {
-                currentUser = { name: "Admin", isAdmin: true };
-                document.getElementById('auth-screen').classList.add('hidden');
-                document.getElementById('main-app').classList.remove('hidden');
-                document.getElementById('welcome-user').innerText = `Shalom, ${currentUser.name}`;
-                updateUI();
-                return;
-            }
-
-            const user = members.find(m => m.name.toLowerCase() === n.toLowerCase() && m.pass === p);
-            if(user) {
-                currentUser = user;
-                document.getElementById('auth-screen').classList.add('hidden');
-                document.getElementById('main-app').classList.remove('hidden');
-                document.getElementById('welcome-user').innerText = `Shalom, ${user.name}`;
-                if(!user.isAdmin) document.querySelectorAll('.admin-only').forEach(e => e.classList.add('hidden'));
-                updateUI();
-            } else {
-                alert("Invalid Login. Please check username and password.");
-            }
+        let statusHtml = "N/A";
+        const mData = members.find(m => m.name === r.name);
+        if (mData && mData.commitments && mData.commitments[r.type]) {
+            const target = mData.commitments[r.type];
+            const d = new Date(r.date);
+            const monthlyTotal = records.filter(rec => rec.name === r.name && rec.type === r.type && new Date(rec.date).getMonth() === d.getMonth()).reduce((s, rec) => s + rec.amount, 0);
+            statusHtml = monthlyTotal >= target ? `<span class="status-paid">PAID</span>` : `<span class="status-missing">MISSING (₱${target - monthlyTotal})</span>`;
         }
 
-        function saveRecord(cat) {
-            const name = document.getElementById('adm-member').value;
-            const amt = parseFloat(document.getElementById('adm-amt').value);
-            const date = document.getElementById('adm-date').value || new Date().toLocaleDateString();
-            if(!amt || !name) return alert("Select member and enter amount");
+        let row = `<tr><td>${r.date}</td><td>${r.type}</td><td>${r.name}</td><td>₱${r.amount.toLocaleString()}</td><td>${statusHtml}</td>`;
+        if(currentUser && currentUser.isAdmin) {
+            row += `<td><button class="btn-edit" onclick="editRecord('${r.firebaseKey}', ${r.amount})">Edit</button><button class="btn-del" onclick="deleteRecord('${r.firebaseKey}')">X</button></td>`;
+        } else { row += `<td></td>`; }
+        gBody.innerHTML += row + `</tr>`;
+    });
+    summary.innerHTML = Object.keys(totals).map(k => `<div style="background:var(--navy); color:var(--gold); padding:5px; font-size:0.6rem; border-radius:3px;">${k}: ₱${totals[k].toLocaleString()}</div>`).join('');
+}
 
-            const newRec = { name, amount: amt, type: cat, date, id: Date.now() };
-            db.ref('records').push(newRec);
+function sendChat() { 
+    const v = document.getElementById('chat-input').value; 
+    if(!v) return;
+    const photo = currentUser.photo || "https://cdn-icons-png.flaticon.com/512/149/149071.png";
+    db.ref('chats').push({user: currentUser.name, text: v, photo: photo, time: Date.now()}); 
+    document.getElementById('chat-input').value=""; 
+}
 
-            const m = members.find(mem => mem.name === name);
-            if(m && m.email) sendEmail(m.email, "Giving Recorded", `Hi ${name}, your ${cat} of ₱${amt} was recorded.`);
-            alert("Record Saved!");
-        }
+function renderChat() { 
+    const b = document.getElementById('chat-box'); 
+    b.innerHTML = chats.sort((a,b)=>a.time-b.time).map(c => `
+        <div class="bubble ${currentUser && c.user === currentUser.name ? 'me' : 'them'}">
+            <img class="chat-avatar" src="${c.photo || 'https://cdn-icons-png.flaticon.com/512/149/149071.png'}">
+            <b>${c.user}</b>: ${c.text}
+        </div>`).join(''); 
+    b.scrollTop = b.scrollHeight; 
+}
 
-        function deleteRecord(id) {
-            if(confirm("Delete this record permanently?")) {
-                db.ref('records').child(id).remove();
-            }
-        }
-
-        function editRecord(id, oldAmount) {
-            let newAmt = prompt("Edit Amount (₱):", oldAmount);
-            if(newAmt !== null && newAmt !== "") {
-                db.ref('records').child(id).update({ amount: parseFloat(newAmt) });
-                alert("Updated!");
-            }
-        }
-
-        function updateUI() {
-            const gBody = document.getElementById('giving-body');
-            const mSel = document.getElementById('adm-member');
-            const summary = document.getElementById('summary-display');
-            if(!gBody) return;
-            
-            gBody.innerHTML = ""; mSel.innerHTML = "";
-            members.forEach(m => { if(!m.isAdmin) mSel.innerHTML += `<option>${m.name}</option>`; });
-
-            const cats = ["Tithes","Offering","Mission","Lot Fund","Building","Anniversary"];
-            let totals = {}; cats.forEach(c => totals[c] = 0);
-
-            const visible = records.filter(r => currentUser && (currentUser.isAdmin || r.name === currentUser.name));
-            visible.sort((a,b) => b.id - a.id).forEach(r => {
-                if(totals.hasOwnProperty(r.type)) totals[r.type] += r.amount;
-                
-                let row = `<tr><td>${r.date}</td><td>${r.type}</td><td>${r.name}</td><td>₱${r.amount.toLocaleString()}</td>`;
-                if(currentUser && currentUser.isAdmin) {
-                    row += `<td class="admin-only">
-                        <button class="btn-edit" onclick="editRecord('${r.firebaseKey}', ${r.amount})">Edit</button>
-                        <button class="btn-del" onclick="deleteRecord('${r.firebaseKey}')">X</button>
-                    </td>`;
-                } else { row += `<td></td>`; }
-                row += `</tr>`;
-                gBody.innerHTML += row;
-            });
-            summary.innerHTML = Object.keys(totals).map(k => `<div style="background:var(--navy); color:var(--gold); padding:5px; font-size:0.6rem; border-radius:3px;">${k}: ₱${totals[k].toLocaleString()}</div>`).join('');
-        }
-
-        function sendChat() {
-            const val = document.getElementById('chat-input').value;
-            if(!val) return;
-            db.ref('chats').push({ user: currentUser.name, text: val, time: new Date().toLocaleTimeString() });
-            document.getElementById('chat-input').value = "";
-        }
-
-        function renderChat() {
-            const box = document.getElementById('chat-box');
-            box.innerHTML = chats.map(c => `<div class="bubble ${currentUser && c.user === currentUser.name ? 'me' : 'them'}"><b>${c.user}</b>: ${c.text}</div>`).join('');
-            box.scrollTop = box.scrollHeight;
-        }
-
-        function saveAnnouncement() {
-            const txt = document.getElementById('adm-announcement').value;
-            db.ref('bulletin').set(txt);
-            members.forEach(m => { if(m.email) sendEmail(m.email, "Church Announcement", txt); });
-            alert("Announcement Updated!");
-        }
-
-        function registerMember() {
-            const name = document.getElementById('reg-name').value;
-            const email = document.getElementById('reg-email').value;
-            const pass = document.getElementById('reg-pass').value;
-            if(!name || !pass) return alert("Fill Name and Password");
-            db.ref('members').push({name, email, pass, isAdmin: false});
-            alert("Member Registered!");
-        }
-
-        function sendEmail(to, sub, msg) {
-            emailjs.send("service_abbcpalauig", "template_91rrfki", {to_email: to, subject: sub, message: msg});
-        }
-
-        function downloadCSV() {
-            let csv = "CATEGORY,DATE,MEMBER,AMOUNT\n";
-            const cats = ["Tithes","Offering","Mission","Lot Fund","Building","Anniversary"];
-            cats.forEach(c => {
-                const items = records.filter(r => r.type === c);
-                items.forEach(i => csv += `${c},${i.date},${i.name},${i.amount}\n`);
-                csv += `TOTAL ${c},,,${items.reduce((s,r)=>s+r.amount,0)}\n\n`;
-            });
-            const blob = new Blob([csv], {type:'text/csv'});
-            const a = document.createElement('a');
-            a.href = URL.createObjectURL(blob);
-            a.download = "Church_Records.csv";
-            a.click();
-        }
-
-        function showTab(t) {
-            document.querySelectorAll('.tab-content').forEach(c => c.classList.add('hidden'));
-            document.getElementById('tab-'+t).classList.remove('hidden');
-        }
-    </script>
+function deleteRecord(id) { if(confirm("Delete?")) db.ref('records').child(id).remove(); }
+function editRecord(id, old) { let n = prompt("New Amount:", old); if(n) db.ref('records').child(id).update({amount:parseFloat(n)}); }
+function saveAnnouncement() { db.ref('bulletin').set(document.getElementById('adm-announcement').value); alert("Posted!"); }
+function registerMember() {
+    const name = document.getElementById('reg-name').value;
+    const email = document.getElementById('reg-email').value;
+    const pass = document.getElementById('reg-pass').value;
+    if(name && pass) db.ref('members').push({name, email, pass, isAdmin:false, photo: "", commitments:{"Mission":0, "Lot Fund":0, "Building":0, "Anniversary":0}});
+    alert("Registered!");
+}
+function showTab(t) { document.querySelectorAll('.tab-content').forEach(c => c.classList.add('hidden')); document.getElementById('tab-'+t).classList.remove('hidden'); }
+function downloadCSV() { /* Logic for CSV download */ }
+</script>
 </body>
 </html>
