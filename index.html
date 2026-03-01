@@ -45,7 +45,6 @@ input, select, textarea { width: 100%; padding: 10px; margin: 8px 0; border: 1px
 .filter-bar { display: grid; grid-template-columns: 1fr 1fr auto; gap: 10px; margin-bottom: 15px; align-items: end; }
 .filter-bar label { font-size: 0.65rem; font-weight: bold; display: block; margin-bottom: -5px; }
 
-/* Custom file upload style */
 input[type="file"] { padding: 5px; background: #eee; font-size: 0.7rem; }
 </style>
 </head>
@@ -82,107 +81,108 @@ input[type="file"] { padding: 5px; background: #eee; font-size: 0.7rem; }
 </nav>
 
 <div class="container">
-<div id="tab-home" class="tab-content">
-<div class="card"><h3>Announcements</h3><div id="announcement-list"></div></div>
-</div>
-
-<div id="tab-chat" class="tab-content hidden">
-<div class="card">
-<h3>Group Chat</h3>
-<div class="chat-container" id="chat-box"></div>
-<div style="display:flex; gap:5px; margin-top:10px;">
-<input type="text" id="chat-input" placeholder="Type a message...">
-<button class="btn btn-offering" onclick="sendChat()">Send</button>
-</div>
-</div>
-</div>
-
-<div id="tab-giving" class="tab-content hidden">
-<div class="card" id="profile-settings-card">
-    <h3>My Profile Photo</h3>
-    <label style="font-size:0.7rem">Choose from Gallery:</label>
-    <div style="display:flex; gap:5px; align-items: center;">
-        <input type="file" id="user-photo-file" accept="image/*">
-        <button class="btn btn-tithe" style="background:var(--navy)" onclick="uploadProfilePic()">Update Photo</button>
+    <div id="tab-home" class="tab-content">
+    <div class="card"><h3>Announcements</h3><div id="announcement-list"></div></div>
     </div>
-</div>
 
-<div class="card">
-<h3>Financial Stewardship</h3>
-<div class="filter-bar">
-    <div><label>From Date</label><input type="date" id="filter-from" onchange="updateUI()"></div>
-    <div><label>To Date</label><input type="date" id="filter-to" onchange="updateUI()"></div>
-    <button class="btn btn-offering" onclick="downloadCSV()">📥 Export Excel</button>
-</div>
-<div id="summary-display" style="display:flex; flex-wrap:wrap; gap:5px; margin-bottom:15px;"></div>
-<div style="overflow-x:auto;">
-<table>
-<thead><tr><th>Date</th><th>Type</th><th>Member</th><th>Amount</th><th>Status</th><th class="admin-only">Action</th></tr></thead>
-<tbody id="giving-body"></tbody>
-</table>
-</div>
-</div>
-</div>
-
-<div id="tab-admin" class="tab-content hidden">
-<div class="card">
-    <h3>Church Identity</h3>
-    <label style="font-size:0.7rem">Select Church Logo from Gallery:</label>
-    <div style="display:flex; gap:5px; align-items: center;">
-        <input type="file" id="logo-file-input" accept="image/*">
-        <button class="btn btn-offering" onclick="uploadLogo()">Save Church Logo</button>
+    <div id="tab-chat" class="tab-content hidden">
+    <div class="card">
+    <h3>Group Chat</h3>
+    <div class="chat-container" id="chat-box"></div>
+    <div style="display:flex; gap:5px; margin-top:10px;">
+    <input type="text" id="chat-input" placeholder="Type a message...">
+    <button class="btn btn-offering" onclick="sendChat()">Send</button>
     </div>
-</div>
+    </div>
+    </div>
 
-<div class="card">
-<h3>Add Record</h3>
-<select id="adm-member"></select>
-<input type="number" id="adm-amt" placeholder="Amount (₱)">
-<input type="date" id="adm-date">
-<div style="display:grid; grid-template-columns: 1fr 1fr; gap:5px;">
-<button class="btn btn-tithe" onclick="saveRecord('Tithes')">Tithes</button>
-<button class="btn btn-offering" onclick="saveRecord('Offering')">Offering</button>
-<button class="btn btn-tithe" style="background:#8e44ad" onclick="saveRecord('Mission')">Mission</button>
-<button class="btn btn-tithe" style="background:#d35400" onclick="saveRecord('Lot Fund')">Lot Fund</button>
-<button class="btn btn-tithe" style="background:#2980b9" onclick="saveRecord('Building')">Building</button>
-<button class="btn btn-tithe" style="background:#c0392b" onclick="saveRecord('Anniversary')">Anniversary</button>
-</div>
-</div>
+    <div id="tab-giving" class="tab-content hidden">
+    <div class="card" id="profile-settings-card">
+        <h3>My Profile Photo</h3>
+        <label style="font-size:0.7rem">Choose from Gallery:</label>
+        <div style="display:flex; gap:5px; align-items: center;">
+            <input type="file" id="user-photo-file" accept="image/*">
+            <button class="btn btn-tithe" style="background:var(--navy)" onclick="uploadProfilePic()">Update Photo</button>
+        </div>
+    </div>
 
-<div class="card">
-<h3>Member Commitments (Monthly Goal)</h3>
-<select id="com-member" onchange="loadCommitmentValues()"></select>
-<div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
-    <div><label style="font-size:0.7rem">Mission</label><input type="number" id="com-mission"></div>
-    <div><label style="font-size:0.7rem">Lot Fund</label><input type="number" id="com-lot"></div>
-    <div><label style="font-size:0.7rem">Building</label><input type="number" id="com-building"></div>
-    <div><label style="font-size:0.7rem">Anniversary</label><input type="number" id="com-anniversary"></div>
-</div>
-<button class="btn btn-offering" style="width:100%; margin-top:10px;" onclick="saveCommitments()">Update Commitments</button>
-</div>
+    <div class="card">
+    <h3>Financial Stewardship</h3>
+    <div class="filter-bar">
+        <div><label>From Date</label><input type="date" id="filter-from" onchange="updateUI()"></div>
+        <div><label>To Date</label><input type="date" id="filter-to" onchange="updateUI()"></div>
+        <button class="btn btn-offering" onclick="downloadCSV()">📥 Export Excel</button>
+    </div>
+    <div id="summary-display" style="display:flex; flex-wrap:wrap; gap:5px; margin-bottom:15px;"></div>
+    <div style="overflow-x:auto;">
+    <table>
+    <thead><tr><th>Date</th><th>Type</th><th>Member</th><th>Amount</th><th>Status</th><th class="admin-only">Action</th></tr></thead>
+    <tbody id="giving-body"></tbody>
+    </table>
+    </div>
+    </div>
+    </div>
 
-<div class="card">
-<h3>Admin Controls</h3>
-<textarea id="adm-announcement" placeholder="Post announcement..."></textarea>
-<button class="btn btn-offering" style="width:100%" onclick="saveAnnouncement()">Post Announcement</button>
-<hr>
-<h4>Register Member</h4>
-<input type="text" id="reg-name" placeholder="Name">
-<input type="email" id="reg-email" placeholder="Email">
-<input type="text" id="reg-pass" placeholder="Password">
-<button class="btn btn-tithe" style="width:100%" onclick="registerMember()">Add Member</button>
-</div>
-</div>
+    <div id="tab-admin" class="tab-content hidden">
+    <div class="card">
+        <h3>Church Identity</h3>
+        <label style="font-size:0.7rem">Select Church Logo from Gallery:</label>
+        <div style="display:flex; gap:5px; align-items: center;">
+            <input type="file" id="logo-file-input" accept="image/*">
+            <button class="btn btn-offering" onclick="uploadLogo()">Save Church Logo</button>
+        </div>
+    </div>
+
+    <div class="card">
+    <h3>Add Record</h3>
+    <select id="adm-member"></select>
+    <input type="number" id="adm-amt" placeholder="Amount (₱)">
+    <input type="date" id="adm-date">
+    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:5px;">
+    <button class="btn btn-tithe" onclick="saveRecord('Tithes')">Tithes</button>
+    <button class="btn btn-offering" onclick="saveRecord('Offering')">Offering</button>
+    <button class="btn btn-tithe" style="background:#8e44ad" onclick="saveRecord('Mission')">Mission</button>
+    <button class="btn btn-tithe" style="background:#d35400" onclick="saveRecord('Lot Fund')">Lot Fund</button>
+    <button class="btn btn-tithe" style="background:#2980b9" onclick="saveRecord('Building')">Building</button>
+    <button class="btn btn-tithe" style="background:#c0392b" onclick="saveRecord('Anniversary')">Anniversary</button>
+    </div>
+    </div>
+
+    <div class="card">
+    <h3>Member Commitments (Monthly Goal)</h3>
+    <select id="com-member" onchange="loadCommitmentValues()"></select>
+    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+        <div><label style="font-size:0.7rem">Mission</label><input type="number" id="com-mission"></div>
+        <div><label style="font-size:0.7rem">Lot Fund</label><input type="number" id="com-lot"></div>
+        <div><label style="font-size:0.7rem">Building</label><input type="number" id="com-building"></div>
+        <div><label style="font-size:0.7rem">Anniversary</label><input type="number" id="com-anniversary"></div>
+    </div>
+    <button class="btn btn-offering" style="width:100%; margin-top:10px;" onclick="saveCommitments()">Update Commitments</button>
+    </div>
+
+    <div class="card">
+    <h3>Admin Controls</h3>
+    <textarea id="adm-announcement" placeholder="Post announcement..."></textarea>
+    <button class="btn btn-offering" style="width:100%" onclick="saveAnnouncement()">Post Announcement</button>
+    <hr>
+    <h4>Register Member</h4>
+    <input type="text" id="reg-name" placeholder="Name">
+    <input type="email" id="reg-email" placeholder="Email">
+    <input type="text" id="reg-pass" placeholder="Password">
+    <button class="btn btn-tithe" style="width:100%" onclick="registerMember()">Add Member</button>
+    </div>
+    </div>
 </div>
 </div>
 
 <script>
+// --- CONFIGURATION ---
 const firebaseConfig = {
-apiKey: "AIzaSyCLY8dNKhi_nXZ5tXnnBL7vYbVNUWTMK3I",
-databaseURL: "https://adullamportal-default-rtdb.asia-southeast1.firebasedatabase.app/",
-projectId: "adullamportal",
-storageBucket: "adullamportal.firebasestorage.app",
-appId: "1:971376913220:web:00bec82a7469d2ff190511"
+    apiKey: "AIzaSyCLY8dNKhi_nXZ5tXnnBL7vYbVNUWTMK3I",
+    databaseURL: "https://adullamportal-default-rtdb.asia-southeast1.firebasedatabase.app/",
+    projectId: "adullamportal",
+    storageBucket: "adullamportal.firebasestorage.app",
+    appId: "1:971376913220:web:00bec82a7469d2ff190511"
 };
 
 firebase.initializeApp(firebaseConfig);
@@ -194,15 +194,14 @@ let records = [];
 let chats = [];
 let currentUser = null;
 
-// --- IMAGE HANDLING (GALLERY) ---
+// --- GALLERY & LOGO HANDLING ---
 function uploadLogo() {
     const file = document.getElementById('logo-file-input').files[0];
     if(!file) return alert("Select an image first");
-    
     const reader = new FileReader();
     reader.onloadend = function() {
         db.ref('settings/logo').set(reader.result);
-        alert("Logo Updated!");
+        alert("Church Logo Updated!");
     }
     reader.readAsDataURL(file);
 }
@@ -211,15 +210,15 @@ function uploadProfilePic() {
     const file = document.getElementById('user-photo-file').files[0];
     if(!file) return alert("Select an image first");
     if(!currentUser.firebaseKey) return alert("Admin photo cannot be changed here.");
-
     const reader = new FileReader();
     reader.onloadend = function() {
         db.ref('members').child(currentUser.firebaseKey).update({ photo: reader.result });
-        alert("Photo Updated!");
+        alert("Personal Photo Updated!");
     }
     reader.readAsDataURL(file);
 }
 
+// --- DATA LISTENERS ---
 db.ref('settings/logo').on('value', (s) => {
     const url = s.val();
     if(url) {
@@ -257,6 +256,7 @@ db.ref('bulletin').on('value', (s) => {
     document.getElementById('announcement-list').innerText = s.val() || "Welcome!";
 });
 
+// --- CORE FUNCTIONS ---
 function handleLogin() {
     const n = document.getElementById('log-name').value.trim();
     const p = document.getElementById('log-pass').value.trim();
@@ -265,11 +265,10 @@ function handleLogin() {
     } else {
         currentUser = members.find(m => m.name.toLowerCase() === n.toLowerCase() && m.pass === p);
     }
-
     if(currentUser) {
         document.getElementById('auth-screen').classList.add('hidden');
         document.getElementById('main-app').classList.remove('hidden');
-        document.getElementById('welcome-user').innerText = `Shalom, ${currentUser.name}`;
+        document.getElementById('greeting').innerText = `Shalom, ${currentUser.name}`;
         if(!currentUser.isAdmin) {
             document.querySelectorAll('.admin-only').forEach(e => e.classList.add('hidden'));
         } else {
@@ -277,6 +276,15 @@ function handleLogin() {
         }
         updateUI();
     } else { alert("Invalid Login."); }
+}
+
+function saveRecord(cat) {
+    const name = document.getElementById('adm-member').value;
+    const amt = parseFloat(document.getElementById('adm-amt').value);
+    const date = document.getElementById('adm-date').value || new Date().toISOString().split('T')[0];
+    if(!amt || !name) return alert("Select member and enter amount");
+    db.ref('records').push({ name, amount: amt, type: cat, date, id: Date.now() });
+    alert("Record Saved!");
 }
 
 function saveCommitments() {
@@ -304,15 +312,6 @@ function loadCommitmentValues() {
     }
 }
 
-function saveRecord(cat) {
-    const name = document.getElementById('adm-member').value;
-    const amt = parseFloat(document.getElementById('adm-amt').value);
-    const date = document.getElementById('adm-date').value || new Date().toISOString().split('T')[0];
-    if(!amt || !name) return alert("Select member and enter amount");
-    db.ref('records').push({ name, amount: amt, type: cat, date, id: Date.now() });
-    alert("Record Saved!");
-}
-
 function updateUI() {
     const gBody = document.getElementById('giving-body');
     const mSel = document.getElementById('adm-member');
@@ -320,7 +319,6 @@ function updateUI() {
     const summary = document.getElementById('summary-display');
     const fromDate = document.getElementById('filter-from').value;
     const toDate = document.getElementById('filter-to').value;
-    
     if(!gBody) return;
 
     gBody.innerHTML = ""; mSel.innerHTML = ""; cSel.innerHTML = "";
@@ -333,14 +331,12 @@ function updateUI() {
 
     const cats = ["Tithes","Offering","Mission","Lot Fund","Building","Anniversary"];
     let totals = {}; cats.forEach(c => totals[c] = 0);
-
     let visible = records.filter(r => currentUser && (currentUser.isAdmin || r.name === currentUser.name));
     if(fromDate) visible = visible.filter(r => r.date >= fromDate);
     if(toDate) visible = visible.filter(r => r.date <= toDate);
 
     visible.sort((a,b) => b.id - a.id).forEach(r => {
         if(totals.hasOwnProperty(r.type)) totals[r.type] += r.amount;
-        
         let statusHtml = "N/A";
         const mData = members.find(m => m.name === r.name);
         if (mData && mData.commitments && mData.commitments[r.type]) {
@@ -349,7 +345,6 @@ function updateUI() {
             const monthlyTotal = records.filter(rec => rec.name === r.name && rec.type === r.type && new Date(rec.date).getMonth() === d.getMonth()).reduce((s, rec) => s + rec.amount, 0);
             statusHtml = monthlyTotal >= target ? `<span class="status-paid">PAID</span>` : `<span class="status-missing">MISSING (₱${target - monthlyTotal})</span>`;
         }
-
         let row = `<tr><td>${r.date}</td><td>${r.type}</td><td>${r.name}</td><td>₱${r.amount.toLocaleString()}</td><td>${statusHtml}</td>`;
         if(currentUser && currentUser.isAdmin) {
             row += `<td><button class="btn-edit" onclick="editRecord('${r.firebaseKey}', ${r.amount})">Edit</button><button class="btn-del" onclick="deleteRecord('${r.firebaseKey}')">X</button></td>`;
@@ -359,24 +354,73 @@ function updateUI() {
     summary.innerHTML = Object.keys(totals).map(k => `<div style="background:var(--navy); color:var(--gold); padding:5px; font-size:0.6rem; border-radius:3px;">${k}: ₱${totals[k].toLocaleString()}</div>`).join('');
 }
 
+// --- ADVANCED EXCEL EXPORT ---
 function downloadCSV() {
     if (records.length === 0) return alert("No records found.");
-    let csv = "Date,Type,Member,Amount,Status\n";
+    const cats = ["Tithes", "Offering", "Mission", "Lot Fund", "Building", "Anniversary"];
     const fromDate = document.getElementById('filter-from').value;
     const toDate = document.getElementById('filter-to').value;
+    
     let visible = records.filter(r => currentUser.isAdmin || r.name === currentUser.name);
     if(fromDate) visible = visible.filter(r => r.date >= fromDate);
     if(toDate) visible = visible.filter(r => r.date <= toDate);
-    visible.forEach(r => {
-        csv += `${r.date},${r.type},${r.name},${r.amount},N/A\n`;
+
+    // Section 1: Member Summary
+    let csv = "--- SUMMARY BY MEMBER ---\n";
+    csv += "Member Name," + cats.join(",") + ",OVERALL STATUS\n";
+
+    const uniqueNames = [...new Set(visible.map(r => r.name))];
+    uniqueNames.forEach(name => {
+        let row = [name];
+        let isMissingAny = false;
+        const mData = members.find(m => m.name === name);
+        cats.forEach(c => {
+            const total = visible.filter(r => r.name === name && r.type === c).reduce((s, r) => s + r.amount, 0);
+            row.push(total);
+            if (mData && mData.commitments && mData.commitments[c]) {
+                if (total < mData.commitments[c]) isMissingAny = true;
+            }
+        });
+        row.push(isMissingAny ? "MISSING" : "PAID");
+        csv += row.join(",") + "\n";
     });
-    const blob = new Blob([csv], { type: 'text/csv' });
+
+    // Section 2: Detailed Log
+    csv += "\n\n--- DETAILED TRANSACTION LOG ---\n";
+    csv += "Date,Member," + cats.join(",") + ",Record Status\n";
+    let catTotals = { "Tithes": 0, "Offering": 0, "Mission": 0, "Lot Fund": 0, "Building": 0, "Anniversary": 0 };
+
+    visible.forEach(r => {
+        let rowData = [r.date, r.name];
+        let recordStatus = "N/A";
+        cats.forEach(c => {
+            if(r.type === c) {
+                rowData.push(r.amount);
+                catTotals[c] += r.amount;
+                const mData = members.find(m => m.name === r.name);
+                if (mData && mData.commitments && mData.commitments[c]) {
+                    const monthlyTotal = records.filter(rec => rec.name === r.name && rec.type === c && new Date(rec.date).getMonth() === new Date(r.date).getMonth()).reduce((s, rec) => s + rec.amount, 0);
+                    recordStatus = monthlyTotal >= mData.commitments[c] ? "PAID" : "MISSING";
+                }
+            } else { rowData.push(0); }
+        });
+        rowData.push(recordStatus);
+        csv += rowData.join(",") + "\n";
+    });
+
+    let totalRow = ["TOTALS", "ALL ENTRIES"];
+    cats.forEach(c => totalRow.push(catTotals[c]));
+    totalRow.push("");
+    csv += "\n" + totalRow.join(",");
+
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
     const a = document.createElement("a");
     a.href = URL.createObjectURL(blob);
-    a.download = `Report.csv`;
+    a.download = `ABBC_Export_${new Date().toLocaleDateString()}.csv`;
     a.click();
 }
 
+// --- UTILS ---
 function sendChat() { 
     const v = document.getElementById('chat-input').value; 
     if(!v) return;
