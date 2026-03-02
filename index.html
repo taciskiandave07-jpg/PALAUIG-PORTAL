@@ -187,7 +187,7 @@ input, select, textarea { width: 100%; padding: 12px; margin: 10px 0; border: 1p
                 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin-bottom: 20px;">
                     <div><label style="font-size:0.7rem">From</label><input type="date" id="filter-from" onchange="updateUI()"></div>
                     <div><label style="font-size:0.7rem">To</label><input type="date" id="filter-to" onchange="updateUI()"></div>
-                    <div style="display:flex; align-items: flex-end;"><button class="btn btn-offering" style="width:100%" onclick="downloadCSV()">📥 Export Excel</button></div>
+                    <div style="display:flex; align-items: flex-end;"><button class="btn btn-offering" style="width:100%" onclick="downloadCSV()">📥 Export ABBCPM Excel</button></div>
                 </div>
                 <div id="summary-display" style="display:flex; flex-wrap:wrap; gap:8px; margin-bottom:15px;"></div>
                 <div style="overflow-x:auto;">
@@ -201,7 +201,7 @@ input, select, textarea { width: 100%; padding: 12px; margin: 10px 0; border: 1p
 
         <div id="tab-admin" class="tab-content hidden">
             <div class="card">
-                <h3>ABBC GOAL</h3>
+                <h3>Church-Wide Project Goals</h3>
                 <p style="font-size: 0.75rem; color: #666;">Edit the target amounts for the progress bars shown to all members.</p>
                 <div style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap:10px;">
                     <div><label style="font-size:0.7rem">Lot Fund (₱)</label><input type="number" id="goal-lot"></div>
@@ -337,6 +337,23 @@ function handleLogin() {
     } else { alert("Login failed."); }
 }
 
+function getCommitmentStatus(memberName, type, amount, date) {
+    const mData = members.find(m => m.name === memberName);
+    if (mData && mData.commitments && mData.commitments[type]) {
+        const target = mData.commitments[type];
+        const d = new Date(date);
+        const monthlyTotal = records.filter(rec => 
+            rec.name === memberName && 
+            rec.type === type && 
+            new Date(rec.date).getMonth() === d.getMonth() &&
+            new Date(rec.date).getFullYear() === d.getFullYear()
+        ).reduce((s, rec) => s + rec.amount, 0);
+        
+        return monthlyTotal >= target ? "PAID" : "MISSING";
+    }
+    return "N/A";
+}
+
 function updateUI() {
     const gBody = document.getElementById('giving-body');
     const mSel = document.getElementById('adm-member');
@@ -351,16 +368,18 @@ function updateUI() {
     let totals = {}; cats.forEach(c => totals[c] = 0);
     
     let visible = records.filter(r => currentUser && (currentUser.isAdmin || r.name === currentUser.name));
+    
+    // Apply Date Filters
+    const fDate = document.getElementById('filter-from').value;
+    const tDate = document.getElementById('filter-to').value;
+    if(fDate) visible = visible.filter(r => r.date >= fDate);
+    if(tDate) visible = visible.filter(r => r.date <= tDate);
+
     visible.sort((a,b) => b.id - a.id).forEach(r => {
         if(totals.hasOwnProperty(r.type)) totals[r.type] += r.amount;
-        let statusHtml = "RECORDED";
-        const mData = members.find(m => m.name === r.name);
-        if (mData && mData.commitments && mData.commitments[r.type]) {
-            const target = mData.commitments[r.type];
-            const d = new Date(r.date);
-            const monthlyTotal = records.filter(rec => rec.name === r.name && rec.type === r.type && new Date(rec.date).getMonth() === d.getMonth()).reduce((s, rec) => s + rec.amount, 0);
-            statusHtml = monthlyTotal >= target ? `<span class="status-paid">PAID</span>` : `<span class="status-missing">₱${(target - monthlyTotal).toLocaleString()} left</span>`;
-        }
+        const status = getCommitmentStatus(r.name, r.type, r.amount, r.date);
+        let statusHtml = status === "PAID" ? `<span class="status-paid">PAID</span>` : (status === "MISSING" ? `<span class="status-missing">MISSING</span>` : "RECORDED");
+        
         let row = `<tr><td>${r.date}</td><td>${r.type}</td><td>${r.name}</td><td>₱${r.amount.toLocaleString()}</td><td>${statusHtml}</td>`;
         if(currentUser && currentUser.isAdmin) row += `<td><button class="btn-edit" onclick="editRecord('${r.firebaseKey}', ${r.amount})">Edit</button> <button class="btn-del" onclick="deleteRecord('${r.firebaseKey}')">X</button></td>`;
         else row += `<td>-</td>`;
@@ -392,6 +411,43 @@ function saveRecord(cat) {
     db.ref('records').push({ name, amount: amt, type: cat, date, id: Date.now() });
     alert("Saved!");
 }
+
+function downloadCSV() {
+    const cats = ["Tithes","Offering","Mission","Lot Fund","Building","Anniversary"];
+    let csv = "ABBCPM FINANCIAL RECORD\n";
+    csv += "Date,Member,Type,Amount,Status\n";
+    
+    let subTotals = {}; cats.forEach(c => subTotals[c] = 0);
+    let grandTotal = 0;
+
+    let visible = records.filter(r => currentUser.isAdmin || r.name === currentUser.name);
+    const fDate = document.getElementById('filter-from').value;
+    const tDate = document.getElementById('filter-to').value;
+    if(fDate) visible = visible.filter(r => r.date >= fDate);
+    if(tDate) visible = visible.filter(r => r.date <= tDate);
+
+    visible.forEach(r => {
+        const status = getCommitmentStatus(r.name, r.type, r.amount, r.date);
+        csv += `${r.date},${r.name},${r.type},${r.amount},${status}\n`;
+        if(subTotals.hasOwnProperty(r.type)) subTotals[r.type] += r.amount;
+        grandTotal += r.amount;
+    });
+
+    csv += "\n--- SUMMARY ---\n";
+    cats.forEach(c => {
+        csv += `${c} Total,, ,${subTotals[c]}\n`;
+    });
+    csv += `GRAND TOTAL,, ,${grandTotal}\n`;
+
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const a = document.createElement("a");
+    const today = new Date().toISOString().split('T')[0];
+    a.href = URL.createObjectURL(blob);
+    a.download = `ABBCPM_FINANCIAL_RECORD_${today}.csv`;
+    a.click();
+}
+
+// ... (Rest of existing logic for chat, profile, register, etc. remains same) ...
 
 function sendChat() { 
     const v = document.getElementById('chat-input').value; 
@@ -453,16 +509,6 @@ function loadCommitmentValues() {
         document.getElementById('com-building').value = m.commitments["Building"] || 0;
         document.getElementById('com-anniversary').value = m.commitments["Anniversary"] || 0;
     }
-}
-
-function downloadCSV() {
-    let csv = "Date,Type,Member,Amount\n";
-    records.forEach(r => { if(currentUser.isAdmin || r.name === currentUser.name) csv += `${r.date},${r.type},${r.name},${r.amount}\n`; });
-    const blob = new Blob([csv], { type: 'text/csv' });
-    const a = document.createElement("a");
-    a.href = URL.createObjectURL(blob);
-    a.download = "Report.csv";
-    a.click();
 }
 
 function deleteRecord(id) { if(confirm("Delete?")) db.ref('records').child(id).remove(); }
