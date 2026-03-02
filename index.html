@@ -10,169 +10,246 @@
 <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
 
 <style>
-:root { --navy: #001f3f; --gold: #d4af37; --white: #ffffff; --danger: #e74c3c; --success: #27ae60; --gray: #f4f4f4; }
-body { font-family: 'Georgia', serif; margin: 0; background: var(--navy); color: #333; min-height: 100vh; padding-bottom: 50px; }
-.bg-pattern { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; background-color: var(--navy); background-image: linear-gradient(90deg, transparent 95%, rgba(212,175,55,0.05) 95%); background-size: 45px 100%; }
+:root { 
+    --navy: #001f3f; 
+    --gold: #d4af37; 
+    --white: #ffffff; 
+    --danger: #e74c3c; 
+    --success: #2c3e50; 
+    --glass: rgba(255, 255, 255, 0.95);
+}
 
-.church-logo { width: 60px; height: 60px; object-fit: contain; border-radius: 50%; border: 2px solid var(--gold); background: white; margin-bottom: 10px; }
-.header-content { display: flex; align-items: center; justify-content: center; gap: 15px; flex-wrap: wrap; }
-.chat-avatar { width: 30px; height: 30px; border-radius: 50%; object-fit: cover; vertical-align: middle; margin-right: 5px; border: 1px solid var(--gold); }
+body { 
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+    margin: 0; 
+    background: radial-gradient(circle at center, #002b55 0%, #001226 100%);
+    color: #333; 
+    min-height: 100vh; 
+    padding-bottom: 50px;
+}
 
-header { background: linear-gradient(to bottom, #001f3f, #002b55); color: var(--gold); padding: 20px; text-align: center; border-bottom: 4px double var(--gold); }
-nav { background: var(--white); display: flex; justify-content: center; flex-wrap: wrap; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 10px rgba(0,0,0,0.3); }
-.nav-link { padding: 12px 15px; color: var(--navy); font-weight: bold; cursor: pointer; text-transform: uppercase; font-size: 0.7rem; }
-.container { max-width: 900px; margin: 20px auto; padding: 0 15px; }
-.card { background: white; padding: 20px; border-radius: 4px; margin-bottom: 20px; border: 1px solid var(--gold); box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
-h3 { border-bottom: 2px solid var(--gold); padding-bottom: 5px; color: var(--navy); margin-top: 0; }
-table { width: 100%; border-collapse: collapse; font-size: 0.8rem; margin-top: 10px; }
-th { background: var(--gray); padding: 8px; text-align: left; border: 1px solid #ddd; }
-td { padding: 8px; border: 1px solid #ddd; }
-.btn { padding: 10px; border: none; cursor: pointer; font-weight: bold; border-radius: 4px; font-size: 0.7rem; transition: 0.2s; color: white; }
-.btn-del { background: var(--danger); padding: 4px 8px; cursor: pointer; border: none; border-radius: 3px; color: white; }
-.btn-edit { background: var(--gold); padding: 4px 8px; cursor: pointer; border: none; border-radius: 3px; color: var(--navy); margin-right: 2px; }
+/* 3D Animated Background */
+.bg-pattern { 
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; 
+    background: linear-gradient(45deg, #001f3f 25%, transparent 25%) -50px 0,
+                linear-gradient(-45deg, #001f3f 25%, transparent 25%) -50px 0,
+                linear-gradient(45deg, transparent 75%, #001f3f 75%),
+                linear-gradient(-45deg, transparent 75%, #001f3f 75%);
+    background-size: 100px 100px;
+    opacity: 0.1;
+    animation: moveBg 30s linear infinite;
+}
+@keyframes moveBg { from { background-position: 0 0; } to { background-position: 1000px 1000px; } }
+
+header { 
+    background: rgba(0, 31, 63, 0.9); 
+    color: var(--gold); 
+    padding: 25px; 
+    text-align: center; 
+    border-bottom: 4px double var(--gold);
+    backdrop-filter: blur(5px);
+}
+.church-logo { width: 80px; height: 80px; object-fit: contain; border-radius: 50%; border: 2px solid var(--gold); background: white; margin-bottom: 10px; box-shadow: 0 0 15px var(--gold); }
+
+.card { 
+    background: var(--glass); 
+    backdrop-filter: blur(10px);
+    padding: 25px; 
+    border-radius: 15px; 
+    margin-bottom: 25px; 
+    border: 1px solid rgba(212, 175, 55, 0.3);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    transform: perspective(1000px) rotateX(1deg);
+}
+.card:hover { transform: perspective(1000px) rotateX(0deg) translateY(-5px); }
+
+nav { background: var(--white); display: flex; justify-content: center; flex-wrap: wrap; position: sticky; top: 0; z-index: 100; box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
+.nav-link { padding: 15px 20px; color: var(--navy); font-weight: bold; cursor: pointer; text-transform: uppercase; font-size: 0.75rem; transition: 0.3s; border-bottom: 3px solid transparent; }
+.nav-link:hover { background: #f8f8f8; border-bottom: 3px solid var(--gold); color: var(--gold); }
+
+.monitor-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px; margin-top: 15px; }
+.monitor-card { background: #fff; padding: 15px; border-radius: 10px; border-left: 5px solid var(--gold); box-shadow: 2px 2px 10px rgba(0,0,0,0.05); }
+.progress-bg { background: #eee; height: 14px; border-radius: 7px; margin-top: 10px; overflow: hidden; position: relative; }
+.progress-fill { background: linear-gradient(90deg, var(--gold), #f39c12); height: 100%; width: 0%; transition: width 1.5s cubic-bezier(0.1, 0, 0.2, 1); }
+.monitor-val { font-weight: bold; font-size: 1rem; color: var(--navy); margin-top: 5px; }
+
+.btn { 
+    padding: 12px; border: none; cursor: pointer; font-weight: bold; border-radius: 8px; font-size: 0.75rem; 
+    transition: all 0.2s; position: relative; top: 0; box-shadow: 0 4px 0 rgba(0,0,0,0.15); color: white;
+}
+.btn:active { top: 3px; box-shadow: 0 1px 0 rgba(0,0,0,0.1); }
 .btn-tithe { background: #2c3e50; }
 .btn-offering { background: #27ae60; }
-.chat-container { height: 350px; overflow-y: auto; border: 1px solid #ddd; padding: 10px; background: #f9f9f9; display: flex; flex-direction: column; }
-.bubble { margin-bottom: 8px; padding: 8px; border-radius: 8px; max-width: 80%; font-size: 0.8rem; line-height: 1.4; }
-.me { align-self: flex-end; background: #dcf8c6; border: 1px solid #c5e1a5; }
-.them { align-self: flex-start; background: #fff; border: 1px solid #eee; }
-input, select, textarea { width: 100%; padding: 10px; margin: 8px 0; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
+.btn-del { background: var(--danger); padding: 5px 10px; box-shadow: none; }
+.btn-edit { background: var(--gold); color: var(--navy); padding: 5px 10px; box-shadow: none; }
+
+.container { max-width: 1000px; margin: 30px auto; padding: 0 15px; }
+h3 { border-bottom: 2px solid var(--gold); padding-bottom: 10px; color: var(--navy); margin-top: 0; font-family: 'Georgia', serif; }
+table { width: 100%; border-collapse: collapse; font-size: 0.85rem; background: white; }
+th { background: #f4f4f4; padding: 12px; text-align: left; border: 1px solid #ddd; color: var(--navy); }
+td { padding: 12px; border: 1px solid #ddd; }
+input, select, textarea { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ccc; border-radius: 8px; }
 .hidden { display: none; }
 
-.status-paid { background: var(--success); color: white; padding: 2px 5px; border-radius: 3px; font-weight: bold; font-size: 0.6rem; }
-.status-missing { background: var(--danger); color: white; padding: 2px 5px; border-radius: 3px; font-weight: bold; font-size: 0.6rem; }
-
-.filter-bar { display: grid; grid-template-columns: 1fr 1fr auto; gap: 10px; margin-bottom: 15px; align-items: end; }
-.filter-bar label { font-size: 0.65rem; font-weight: bold; display: block; margin-bottom: -5px; }
-
-input[type="file"] { padding: 5px; background: #eee; font-size: 0.7rem; }
+.chat-container { height: 400px; overflow-y: auto; border: 1px solid #eee; padding: 15px; background: #fafafa; border-radius: 10px; display: flex; flex-direction: column; }
+.bubble { margin-bottom: 12px; padding: 10px 15px; border-radius: 15px; max-width: 75%; position: relative; font-size: 0.9rem; }
+.me { align-self: flex-end; background: #dcf8c6; border: 1px solid #c5e1a5; border-bottom-right-radius: 2px; }
+.them { align-self: flex-start; background: #fff; border: 1px solid #ddd; border-bottom-left-radius: 2px; }
+.chat-avatar { width: 35px; height: 35px; border-radius: 50%; margin-right: 8px; border: 1px solid var(--gold); }
+.status-paid { background: #27ae60; color: white; padding: 3px 8px; border-radius: 5px; font-size: 0.65rem; }
+.status-missing { background: var(--danger); color: white; padding: 3px 8px; border-radius: 5px; font-size: 0.65rem; }
 </style>
 </head>
 <body>
 <div class="bg-pattern"></div>
 
 <div id="auth-screen">
-<div class="card" style="max-width: 320px; margin: 80px auto; text-align: center;">
-<img id="login-logo" class="church-logo hidden" src="" alt="Logo">
-<h2 style="color:var(--navy); margin:10px 0; font-size: 1.1rem;">ADULLAM BIBLE BAPTIST CHURCH PALAUIG PORTAL</h2>
-<input type="text" id="log-name" placeholder="User Name">
-<input type="password" id="log-pass" placeholder="Password">
-<button class="btn btn-tithe" style="width:100%" onclick="handleLogin()">Login</button>
-</div>
+    <div class="card" style="max-width: 450px; margin: 150px auto; text-align: center;">
+        <img id="login-logo" class="church-logo hidden" src="" alt="Logo">
+        <h2 style="color:var(--navy); font-size: 1.2rem;">ADULLAM BIBLE BAPTIST CHURCH<br><small>PALAUIG PORTAL</small></h2>
+        <input type="text" id="log-name" placeholder="User Name">
+        <input type="password" id="log-pass" placeholder="Password">
+        <button class="btn btn-tithe" style="width:100%" onclick="handleLogin()">Login to Portal</button>
+    </div>
 </div>
 
 <div id="main-app" class="hidden">
-<header>
-<div class="header-content">
-    <img id="header-logo" class="church-logo hidden" src="" alt="Logo">
-    <div>
-        <div style="font-size: 1.2rem; font-weight: bold;">ADULLAM BIBLE BAPTIST CHURCH PALAUIG</div>
-        <div id="greeting" style="color:white; font-size: 0.8rem;"></div>
-    </div>
-</div>
-</header>
+    <header>
+        <div style="display: flex; align-items: center; justify-content: center; gap: 20px;">
+            <img id="header-logo" class="church-logo hidden" src="" alt="Logo">
+            <div>
+                <div style="font-size: 1.5rem; font-weight: bold; letter-spacing: 1px;">ADULLAM BIBLE BAPTIST CHURCH</div>
+                <div id="greeting" style="color:white; font-style: italic;"></div>
+            </div>
+        </div>
+    </header>
 
-<nav>
-<div class="nav-link" onclick="showTab('home')">Bulletin</div>
-<div class="nav-link" onclick="showTab('giving')">My Records</div>
-<div class="nav-link" onclick="showTab('chat')">Fellowship Chat</div>
-<div class="nav-link admin-only" onclick="showTab('admin')">Admin Office</div>
-<div class="nav-link" onclick="location.reload()">Logout</div>
-</nav>
+    <nav>
+        <div class="nav-link" onclick="showTab('home')">Bulletin</div>
+        <div class="nav-link" onclick="showTab('giving')">Financial Records</div>
+        <div class="nav-link" onclick="showTab('chat')">Fellowship</div>
+        <div class="nav-link admin-only" onclick="showTab('admin')">Administration</div>
+        <div class="nav-link" onclick="location.reload()">Logout</div>
+    </nav>
 
-<div class="container">
-    <div id="tab-home" class="tab-content">
-    <div class="card"><h3>Announcements</h3><div id="announcement-list"></div></div>
-    </div>
+    <div class="container">
+        <div id="tab-home" class="tab-content">
+            <div class="card">
+                <h3>Church Announcements</h3>
+                <div id="announcement-list" style="white-space: pre-wrap; line-height: 1.6;"></div>
+            </div>
+        </div>
 
-    <div id="tab-chat" class="tab-content hidden">
-    <div class="card">
-    <h3>Group Chat</h3>
-    <div class="chat-container" id="chat-box"></div>
-    <div style="display:flex; gap:5px; margin-top:10px;">
-    <input type="text" id="chat-input" placeholder="Type a message...">
-    <button class="btn btn-offering" onclick="sendChat()">Send</button>
-    </div>
-    </div>
-    </div>
+        <div id="tab-chat" class="tab-content hidden">
+            <div class="card">
+                <h3>Fellowship Chat</h3>
+                <div class="chat-container" id="chat-box"></div>
+                <div style="display:flex; gap:10px; margin-top:15px;">
+                    <input type="text" id="chat-input" placeholder="Share a message or prayer request...">
+                    <button class="btn btn-offering" style="width: 120px;" onclick="sendChat()">Send</button>
+                </div>
+            </div>
+        </div>
 
-    <div id="tab-giving" class="tab-content hidden">
-    <div class="card" id="profile-settings-card">
-        <h3>My Profile Photo</h3>
-        <label style="font-size:0.7rem">Choose from Gallery:</label>
-        <div style="display:flex; gap:5px; align-items: center;">
-            <input type="file" id="user-photo-file" accept="image/*">
-            <button class="btn btn-tithe" style="background:var(--navy)" onclick="uploadProfilePic()">Update Photo</button>
+        <div id="tab-giving" class="tab-content hidden">
+            <div class="card">
+                <h3>Building & Vision Monitor</h3>
+                <div class="monitor-container">
+                    <div class="monitor-card">
+                        <div>Lot Fund Progress</div>
+                        <div class="monitor-val" id="mon-lot-val">₱0</div>
+                        <div class="progress-bg"><div id="mon-lot-bar" class="progress-fill"></div></div>
+                    </div>
+                    <div class="monitor-card">
+                        <div>Building Progress</div>
+                        <div class="monitor-val" id="mon-build-val">₱0</div>
+                        <div class="progress-bg"><div id="mon-build-bar" class="progress-fill"></div></div>
+                    </div>
+                    <div class="monitor-card">
+                        <div>Anniversary Progress</div>
+                        <div class="monitor-val" id="mon-anniv-val">₱0</div>
+                        <div class="progress-bg"><div id="mon-anniv-bar" class="progress-fill"></div></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card" id="profile-settings-card">
+                <h3>My Profile</h3>
+                <div style="display:flex; gap:15px; align-items: center;">
+                    <input type="file" id="user-photo-file" accept="image/*">
+                    <button class="btn btn-tithe" onclick="uploadProfilePic()">Update Photo</button>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>Financial Stewardship</h3>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin-bottom: 20px;">
+                    <div><label style="font-size:0.7rem">From</label><input type="date" id="filter-from" onchange="updateUI()"></div>
+                    <div><label style="font-size:0.7rem">To</label><input type="date" id="filter-to" onchange="updateUI()"></div>
+                    <div style="display:flex; align-items: flex-end;"><button class="btn btn-offering" style="width:100%" onclick="downloadCSV()">📥 Export Excel</button></div>
+                </div>
+                <div id="summary-display" style="display:flex; flex-wrap:wrap; gap:8px; margin-bottom:15px;"></div>
+                <div style="overflow-x:auto;">
+                    <table>
+                        <thead><tr><th>Date</th><th>Type</th><th>Member</th><th>Amount</th><th>Status</th><th class="admin-only">Action</th></tr></thead>
+                        <tbody id="giving-body"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div id="tab-admin" class="tab-content hidden">
+            <div class="card">
+                <h3>ABBC GOAL</h3>
+                <p style="font-size: 0.75rem; color: #666;">Edit the target amounts for the progress bars shown to all members.</p>
+                <div style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap:10px;">
+                    <div><label style="font-size:0.7rem">Lot Fund (₱)</label><input type="number" id="goal-lot"></div>
+                    <div><label style="font-size:0.7rem">Building (₱)</label><input type="number" id="goal-build"></div>
+                    <div><label style="font-size:0.7rem">Anniversary (₱)</label><input type="number" id="goal-anniv"></div>
+                </div>
+                <button class="btn btn-offering" style="width:100%" onclick="saveGlobalGoals()">Update All Church Goals</button>
+            </div>
+
+            <div class="card">
+                <h3>Add Financial Record</h3>
+                <select id="adm-member"></select>
+                <input type="number" id="adm-amt" placeholder="Amount (₱)">
+                <input type="date" id="adm-date">
+                <div style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap:8px;">
+                    <button class="btn btn-tithe" onclick="saveRecord('Tithes')">Tithes</button>
+                    <button class="btn btn-offering" onclick="saveRecord('Offering')">Offering</button>
+                    <button class="btn" style="background:#8e44ad" onclick="saveRecord('Mission')">Mission</button>
+                    <button class="btn" style="background:#d35400" onclick="saveRecord('Lot Fund')">Lot Fund</button>
+                    <button class="btn" style="background:#2980b9" onclick="saveRecord('Building')">Building</button>
+                    <button class="btn" style="background:#c0392b" onclick="saveRecord('Anniversary')">Anniversary</button>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>Member Individual Goals</h3>
+                <select id="com-member" onchange="loadCommitmentValues()"></select>
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:15px;">
+                    <div><label>Mission Goal</label><input type="number" id="com-mission"></div>
+                    <div><label>Lot Fund Goal</label><input type="number" id="com-lot"></div>
+                    <div><label>Building Goal</label><input type="number" id="com-building"></div>
+                    <div><label>Anniversary Goal</label><input type="number" id="com-anniversary"></div>
+                </div>
+                <button class="btn btn-offering" style="width:100%" onclick="saveCommitments()">Save Individual Commitments</button>
+            </div>
+
+            <div class="card">
+                <h3>Management Office</h3>
+                <textarea id="adm-announcement" rows="4" placeholder="Type church announcements here..."></textarea>
+                <button class="btn btn-offering" style="width:100%" onclick="saveAnnouncement()">Post Bulletin</button>
+                <hr style="margin:20px 0; opacity: 0.1;">
+                <h4>Register Member</h4>
+                <input type="text" id="reg-name" placeholder="Full Name">
+                <input type="text" id="reg-pass" placeholder="Password">
+                <button class="btn btn-tithe" style="width:100%" onclick="registerMember()">Create Account</button>
+            </div>
         </div>
     </div>
-
-    <div class="card">
-    <h3>Financial Stewardship</h3>
-    <div class="filter-bar">
-        <div><label>From Date</label><input type="date" id="filter-from" onchange="updateUI()"></div>
-        <div><label>To Date</label><input type="date" id="filter-to" onchange="updateUI()"></div>
-        <button class="btn btn-offering" onclick="downloadCSV()">📥 Export Excel</button>
-    </div>
-    <div id="summary-display" style="display:flex; flex-wrap:wrap; gap:5px; margin-bottom:15px;"></div>
-    <div style="overflow-x:auto;">
-    <table>
-    <thead><tr><th>Date</th><th>Type</th><th>Member</th><th>Amount</th><th>Status</th><th class="admin-only">Action</th></tr></thead>
-    <tbody id="giving-body"></tbody>
-    </table>
-    </div>
-    </div>
-    </div>
-
-    <div id="tab-admin" class="tab-content hidden">
-    <div class="card">
-        <h3>Church Identity</h3>
-        <label style="font-size:0.7rem">Select Church Logo from Gallery:</label>
-        <div style="display:flex; gap:5px; align-items: center;">
-            <input type="file" id="logo-file-input" accept="image/*">
-            <button class="btn btn-offering" onclick="uploadLogo()">Save Church Logo</button>
-        </div>
-    </div>
-
-    <div class="card">
-    <h3>Add Record</h3>
-    <select id="adm-member"></select>
-    <input type="number" id="adm-amt" placeholder="Amount (₱)">
-    <input type="date" id="adm-date">
-    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:5px;">
-    <button class="btn btn-tithe" onclick="saveRecord('Tithes')">Tithes</button>
-    <button class="btn btn-offering" onclick="saveRecord('Offering')">Offering</button>
-    <button class="btn btn-tithe" style="background:#8e44ad" onclick="saveRecord('Mission')">Mission</button>
-    <button class="btn btn-tithe" style="background:#d35400" onclick="saveRecord('Lot Fund')">Lot Fund</button>
-    <button class="btn btn-tithe" style="background:#2980b9" onclick="saveRecord('Building')">Building</button>
-    <button class="btn btn-tithe" style="background:#c0392b" onclick="saveRecord('Anniversary')">Anniversary</button>
-    </div>
-    </div>
-
-    <div class="card">
-    <h3>Member Commitments (Monthly Goal)</h3>
-    <select id="com-member" onchange="loadCommitmentValues()"></select>
-    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
-        <div><label style="font-size:0.7rem">Mission</label><input type="number" id="com-mission"></div>
-        <div><label style="font-size:0.7rem">Lot Fund</label><input type="number" id="com-lot"></div>
-        <div><label style="font-size:0.7rem">Building</label><input type="number" id="com-building"></div>
-        <div><label style="font-size:0.7rem">Anniversary</label><input type="number" id="com-anniversary"></div>
-    </div>
-    <button class="btn btn-offering" style="width:100%; margin-top:10px;" onclick="saveCommitments()">Update Commitments</button>
-    </div>
-
-    <div class="card">
-    <h3>Admin Controls</h3>
-    <textarea id="adm-announcement" placeholder="Post announcement..."></textarea>
-    <button class="btn btn-offering" style="width:100%" onclick="saveAnnouncement()">Post Announcement</button>
-    <hr>
-    <h4>Register Member</h4>
-    <input type="text" id="reg-name" placeholder="Name">
-    <input type="email" id="reg-email" placeholder="Email">
-    <input type="text" id="reg-pass" placeholder="Password">
-    <button class="btn btn-tithe" style="width:100%" onclick="registerMember()">Add Member</button>
-    </div>
-    </div>
-</div>
 </div>
 
 <script>
@@ -186,54 +263,35 @@ const firebaseConfig = {
 
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
-emailjs.init("2hSBkJZQ_Xsskx-Kw");
 
 let members = [];
 let records = [];
 let chats = [];
 let currentUser = null;
+let currentGoals = { "Lot Fund": 1000000, "Building": 500000, "Anniversary": 100000 };
 
-function uploadLogo() {
-    const file = document.getElementById('logo-file-input').files[0];
-    if(!file) return alert("Select an image first");
-    const reader = new FileReader();
-    reader.onloadend = function() {
-        db.ref('settings/logo').set(reader.result);
-        alert("Church Logo Updated!");
+// --- DATA LISTENERS ---
+db.ref('settings/goals').on('value', (s) => {
+    const data = s.val();
+    if(data) {
+        currentGoals = data;
+        if(document.getElementById('goal-lot')) {
+            document.getElementById('goal-lot').value = data["Lot Fund"];
+            document.getElementById('goal-build').value = data["Building"];
+            document.getElementById('goal-anniv').value = data["Anniversary"];
+        }
     }
-    reader.readAsDataURL(file);
-}
-
-function uploadProfilePic() {
-    const file = document.getElementById('user-photo-file').files[0];
-    if(!file) return alert("Select an image first");
-    if(!currentUser.firebaseKey) return alert("Admin photo cannot be changed here.");
-    const reader = new FileReader();
-    reader.onloadend = function() {
-        db.ref('members').child(currentUser.firebaseKey).update({ photo: reader.result });
-        alert("Personal Photo Updated!");
-    }
-    reader.readAsDataURL(file);
-}
+    updateUI();
+});
 
 db.ref('settings/logo').on('value', (s) => {
     const url = s.val();
-    if(url) {
-        document.querySelectorAll('#login-logo, #header-logo').forEach(img => {
-            img.src = url; img.classList.remove('hidden');
-        });
-    }
+    if(url) document.querySelectorAll('#login-logo, #header-logo').forEach(img => { img.src = url; img.classList.remove('hidden'); });
 });
 
 db.ref('members').on('value', (s) => {
     const data = s.val();
-    if (data) {
-        members = Object.keys(data).map(key => ({ ...data[key], firebaseKey: key }));
-        if(currentUser && !currentUser.isAdmin) {
-            const updated = members.find(m => m.firebaseKey === currentUser.firebaseKey);
-            if(updated) currentUser = updated;
-        }
-    } else { members = [{name: 'ABBC ADMIN', pass: 'abbc22', isAdmin: true}]; }
+    members = data ? Object.keys(data).map(key => ({ ...data[key], firebaseKey: key })) : [];
     updateUI();
 });
 
@@ -244,8 +302,7 @@ db.ref('records').on('value', (s) => {
 });
 
 db.ref('chats').on('value', (s) => {
-    const data = s.val();
-    chats = data ? Object.values(data) : [];
+    chats = s.val() ? Object.values(s.val()) : [];
     renderChat();
 });
 
@@ -253,10 +310,20 @@ db.ref('bulletin').on('value', (s) => {
     document.getElementById('announcement-list').innerText = s.val() || "Welcome!";
 });
 
+// --- CORE FUNCTIONS ---
+function saveGlobalGoals() {
+    const newGoals = {
+        "Lot Fund": parseFloat(document.getElementById('goal-lot').value) || 0,
+        "Building": parseFloat(document.getElementById('goal-build').value) || 0,
+        "Anniversary": parseFloat(document.getElementById('goal-anniv').value) || 0
+    };
+    db.ref('settings/goals').set(newGoals).then(() => alert("Church goals updated!"));
+}
+
 function handleLogin() {
     const n = document.getElementById('log-name').value.trim();
     const p = document.getElementById('log-pass').value.trim();
-    if (n === "Admin" && p === "admin123") {
+    if (n.toLowerCase() === "admin" && p === "admin123") {
         currentUser = { name: "Admin", isAdmin: true };
     } else {
         currentUser = members.find(m => m.name.toLowerCase() === n.toLowerCase() && m.pass === p);
@@ -265,47 +332,9 @@ function handleLogin() {
         document.getElementById('auth-screen').classList.add('hidden');
         document.getElementById('main-app').classList.remove('hidden');
         document.getElementById('greeting').innerText = `Shalom, ${currentUser.name}`;
-        if(!currentUser.isAdmin) {
-            document.querySelectorAll('.admin-only').forEach(e => e.classList.add('hidden'));
-        } else {
-            document.getElementById('profile-settings-card').classList.add('hidden');
-        }
+        if(!currentUser.isAdmin) document.querySelectorAll('.admin-only').forEach(e => e.classList.add('hidden'));
         updateUI();
-    } else { alert("Invalid Login."); }
-}
-
-function saveRecord(cat) {
-    const name = document.getElementById('adm-member').value;
-    const amt = parseFloat(document.getElementById('adm-amt').value);
-    const date = document.getElementById('adm-date').value || new Date().toISOString().split('T')[0];
-    if(!amt || !name) return alert("Select member and enter amount");
-    db.ref('records').push({ name, amount: amt, type: cat, date, id: Date.now() });
-    alert("Record Saved!");
-}
-
-function saveCommitments() {
-    const name = document.getElementById('com-member').value;
-    const m = members.find(mem => mem.name === name);
-    if(!m) return;
-    const comms = {
-        "Mission": parseFloat(document.getElementById('com-mission').value) || 0,
-        "Lot Fund": parseFloat(document.getElementById('com-lot').value) || 0,
-        "Building": parseFloat(document.getElementById('com-building').value) || 0,
-        "Anniversary": parseFloat(document.getElementById('com-anniversary').value) || 0
-    };
-    db.ref('members').child(m.firebaseKey).update({ commitments: comms });
-    alert("Commitments updated!");
-}
-
-function loadCommitmentValues() {
-    const name = document.getElementById('com-member').value;
-    const m = members.find(mem => mem.name === name);
-    if(m && m.commitments) {
-        document.getElementById('com-mission').value = m.commitments["Mission"] || 0;
-        document.getElementById('com-lot').value = m.commitments["Lot Fund"] || 0;
-        document.getElementById('com-building').value = m.commitments["Building"] || 0;
-        document.getElementById('com-anniversary').value = m.commitments["Anniversary"] || 0;
-    }
+    } else { alert("Login failed."); }
 }
 
 function updateUI() {
@@ -313,112 +342,55 @@ function updateUI() {
     const mSel = document.getElementById('adm-member');
     const cSel = document.getElementById('com-member');
     const summary = document.getElementById('summary-display');
-    const fromDate = document.getElementById('filter-from').value;
-    const toDate = document.getElementById('filter-to').value;
     if(!gBody) return;
 
     gBody.innerHTML = ""; mSel.innerHTML = ""; cSel.innerHTML = "";
-    members.forEach(m => { 
-        if(!m.isAdmin) {
-            mSel.innerHTML += `<option>${m.name}</option>`;
-            cSel.innerHTML += `<option>${m.name}</option>`;
-        }
-    });
+    members.forEach(m => { if(!m.isAdmin) { mSel.innerHTML += `<option>${m.name}</option>`; cSel.innerHTML += `<option>${m.name}</option>`; } });
 
     const cats = ["Tithes","Offering","Mission","Lot Fund","Building","Anniversary"];
     let totals = {}; cats.forEach(c => totals[c] = 0);
+    
     let visible = records.filter(r => currentUser && (currentUser.isAdmin || r.name === currentUser.name));
-    if(fromDate) visible = visible.filter(r => r.date >= fromDate);
-    if(toDate) visible = visible.filter(r => r.date <= toDate);
-
     visible.sort((a,b) => b.id - a.id).forEach(r => {
         if(totals.hasOwnProperty(r.type)) totals[r.type] += r.amount;
         let statusHtml = "RECORDED";
         const mData = members.find(m => m.name === r.name);
-        
         if (mData && mData.commitments && mData.commitments[r.type]) {
             const target = mData.commitments[r.type];
             const d = new Date(r.date);
             const monthlyTotal = records.filter(rec => rec.name === r.name && rec.type === r.type && new Date(rec.date).getMonth() === d.getMonth()).reduce((s, rec) => s + rec.amount, 0);
-            statusHtml = monthlyTotal >= target ? `<span class="status-paid">PAID</span>` : `<span class="status-missing">MISSING (₱${(target - monthlyTotal).toLocaleString()})</span>`;
+            statusHtml = monthlyTotal >= target ? `<span class="status-paid">PAID</span>` : `<span class="status-missing">₱${(target - monthlyTotal).toLocaleString()} left</span>`;
         }
-        
         let row = `<tr><td>${r.date}</td><td>${r.type}</td><td>${r.name}</td><td>₱${r.amount.toLocaleString()}</td><td>${statusHtml}</td>`;
-        if(currentUser && currentUser.isAdmin) {
-            row += `<td><button class="btn-edit" onclick="editRecord('${r.firebaseKey}', ${r.amount})">Edit</button><button class="btn-del" onclick="deleteRecord('${r.firebaseKey}')">X</button></td>`;
-        } else { row += `<td></td>`; }
+        if(currentUser && currentUser.isAdmin) row += `<td><button class="btn-edit" onclick="editRecord('${r.firebaseKey}', ${r.amount})">Edit</button> <button class="btn-del" onclick="deleteRecord('${r.firebaseKey}')">X</button></td>`;
+        else row += `<td>-</td>`;
         gBody.innerHTML += row + `</tr>`;
     });
-    summary.innerHTML = Object.keys(totals).map(k => `<div style="background:var(--navy); color:var(--gold); padding:5px; font-size:0.6rem; border-radius:3px;">${k}: ₱${totals[k].toLocaleString()}</div>`).join('');
+
+    summary.innerHTML = Object.keys(totals).map(k => `<div style="background:var(--navy); color:var(--gold); padding:8px 12px; font-size:0.75rem; border-radius:8px;">${k}: ₱${totals[k].toLocaleString()}</div>`).join('');
+
+    let globalTotals = { "Lot Fund": 0, "Building": 0, "Anniversary": 0 };
+    records.forEach(r => { if(globalTotals.hasOwnProperty(r.type)) globalTotals[r.type] += r.amount; });
+    updateMonitor('lot', globalTotals["Lot Fund"], currentGoals["Lot Fund"]);
+    updateMonitor('build', globalTotals["Building"], currentGoals["Building"]);
+    updateMonitor('anniv', globalTotals["Anniversary"], currentGoals["Anniversary"]);
 }
 
-// --- UPDATED EXCEL EXPORT ---
-function downloadCSV() {
-    if (records.length === 0) return alert("No records found.");
-    const cats = ["Tithes", "Offering", "Mission", "Lot Fund", "Building", "Anniversary"];
-    const fromDate = document.getElementById('filter-from').value;
-    const toDate = document.getElementById('filter-to').value;
-    
-    let visible = records.filter(r => currentUser.isAdmin || r.name === currentUser.name);
-    if(fromDate) visible = visible.filter(r => r.date >= fromDate);
-    if(toDate) visible = visible.filter(r => r.date <= toDate);
+function updateMonitor(id, current, goal) {
+    const percent = goal > 0 ? Math.min((current / goal) * 100, 100) : 0;
+    const elVal = document.getElementById(`mon-${id}-val`);
+    const elBar = document.getElementById(`mon-${id}-bar`);
+    if(elVal) elVal.innerText = `₱${current.toLocaleString()} / ₱${goal.toLocaleString()}`;
+    if(elBar) elBar.style.width = percent + "%";
+}
 
-    // CSV Header with individual columns
-    let csv = "Date,Member Name," + cats.join(",") + ",Total Given,Status\n";
-    
-    let grandTotal = 0;
-    let categorySums = { "Tithes": 0, "Offering": 0, "Mission": 0, "Lot Fund": 0, "Building": 0, "Anniversary": 0 };
-
-    visible.forEach(r => {
-        let row = [r.date, r.name];
-        let totalForRow = 0;
-        let status = "RECORDED";
-
-        // Fill individual category columns
-        cats.forEach(c => {
-            if (r.type === c) {
-                row.push(r.amount);
-                categorySums[c] += r.amount;
-                totalForRow += r.amount;
-                grandTotal += r.amount;
-
-                // Check goal status for Mission, Lot, Building, Anniversary
-                const mData = members.find(m => m.name === r.name);
-                if (mData && mData.commitments && mData.commitments[c]) {
-                    const goal = mData.commitments[c];
-                    // Calculate total given by this member for this category in this specific month
-                    const currentMonth = new Date(r.date).getMonth();
-                    const currentYear = new Date(r.date).getFullYear();
-                    
-                    const monthlyTotal = records.filter(rec => {
-                        const d = new Date(rec.date);
-                        return rec.name === r.name && rec.type === c && d.getMonth() === currentMonth && d.getFullYear() === currentYear;
-                    }).reduce((sum, rec) => sum + rec.amount, 0);
-
-                    status = monthlyTotal >= goal ? "PAID" : "MISSING";
-                }
-            } else {
-                row.push(0);
-            }
-        });
-
-        row.push(totalForRow);
-        row.push(status);
-        csv += row.join(",") + "\n";
-    });
-
-    // Individual Sums Row
-    let sumRow = ["TOTALS", "ALL MEMBERS"];
-    cats.forEach(c => sumRow.push(categorySums[c]));
-    sumRow.push(grandTotal);
-    sumRow.push("---");
-    csv += "\n" + sumRow.join(",");
-
-    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-    const a = document.createElement("a");
-    a.href = URL.createObjectURL(blob);
-    a.download = `ABBC_Financial_Report_${new Date().toISOString().split('T')[0]}.csv`;
-    a.click();
+function saveRecord(cat) {
+    const name = document.getElementById('adm-member').value;
+    const amt = parseFloat(document.getElementById('adm-amt').value);
+    const date = document.getElementById('adm-date').value || new Date().toISOString().split('T')[0];
+    if(!amt || !name) return alert("Fill all fields");
+    db.ref('records').push({ name, amount: amt, type: cat, date, id: Date.now() });
+    alert("Saved!");
 }
 
 function sendChat() { 
@@ -433,20 +405,73 @@ function renderChat() {
     const b = document.getElementById('chat-box'); 
     b.innerHTML = chats.sort((a,b)=>a.time-b.time).map(c => `
         <div class="bubble ${currentUser && c.user === currentUser.name ? 'me' : 'them'}">
-            <img class="chat-avatar" src="${c.photo || 'https://cdn-icons-png.flaticon.com/512/149/149071.png'}">
-            <b>${c.user}</b>: ${c.text}
+            <div style="display:flex; align-items:center; gap:5px; margin-bottom:5px;">
+                <img class="chat-avatar" src="${c.photo}">
+                <b style="font-size:0.75rem">${c.user}</b>
+            </div>
+            ${c.text}
         </div>`).join(''); 
     b.scrollTop = b.scrollHeight; 
 }
 
+function uploadLogo() {
+    const file = document.getElementById('logo-file-input').files[0];
+    if(!file) return;
+    const reader = new FileReader();
+    reader.onloadend = () => db.ref('settings/logo').set(reader.result);
+    reader.readAsDataURL(file);
+}
+
+function uploadProfilePic() {
+    const file = document.getElementById('user-photo-file').files[0];
+    if(!file) return;
+    const reader = new FileReader();
+    reader.onloadend = () => db.ref('members').child(currentUser.firebaseKey).update({ photo: reader.result });
+    reader.readAsDataURL(file);
+}
+
+function saveCommitments() {
+    const name = document.getElementById('com-member').value;
+    const m = members.find(mem => mem.name === name);
+    if(!m) return;
+    const comms = {
+        "Mission": parseFloat(document.getElementById('com-mission').value) || 0,
+        "Lot Fund": parseFloat(document.getElementById('com-lot').value) || 0,
+        "Building": parseFloat(document.getElementById('com-building').value) || 0,
+        "Anniversary": parseFloat(document.getElementById('com-anniversary').value) || 0
+    };
+    db.ref('members').child(m.firebaseKey).update({ commitments: comms });
+    alert("Saved Commitments!");
+}
+
+function loadCommitmentValues() {
+    const name = document.getElementById('com-member').value;
+    const m = members.find(mem => mem.name === name);
+    if(m && m.commitments) {
+        document.getElementById('com-mission').value = m.commitments["Mission"] || 0;
+        document.getElementById('com-lot').value = m.commitments["Lot Fund"] || 0;
+        document.getElementById('com-building').value = m.commitments["Building"] || 0;
+        document.getElementById('com-anniversary').value = m.commitments["Anniversary"] || 0;
+    }
+}
+
+function downloadCSV() {
+    let csv = "Date,Type,Member,Amount\n";
+    records.forEach(r => { if(currentUser.isAdmin || r.name === currentUser.name) csv += `${r.date},${r.type},${r.name},${r.amount}\n`; });
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = "Report.csv";
+    a.click();
+}
+
 function deleteRecord(id) { if(confirm("Delete?")) db.ref('records').child(id).remove(); }
 function editRecord(id, old) { let n = prompt("New Amount:", old); if(n) db.ref('records').child(id).update({amount:parseFloat(n)}); }
-function saveAnnouncement() { db.ref('bulletin').set(document.getElementById('adm-announcement').value); alert("Posted!"); }
+function saveAnnouncement() { db.ref('bulletin').set(document.getElementById('adm-announcement').value); alert("Bulletin Updated!"); }
 function registerMember() {
     const name = document.getElementById('reg-name').value;
-    const email = document.getElementById('reg-email').value;
     const pass = document.getElementById('reg-pass').value;
-    if(name && pass) db.ref('members').push({name, email, pass, isAdmin:false, photo: "", commitments:{"Mission":0, "Lot Fund":0, "Building":0, "Anniversary":0}});
+    if(name && pass) db.ref('members').push({name, pass, isAdmin:false, photo: "", commitments:{"Mission":0, "Lot Fund":0, "Building":0, "Anniversary":0}});
     alert("Registered!");
 }
 function showTab(t) { document.querySelectorAll('.tab-content').forEach(c => c.classList.add('hidden')); document.getElementById('tab-'+t).classList.remove('hidden'); }
