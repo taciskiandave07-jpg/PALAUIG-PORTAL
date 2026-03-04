@@ -413,41 +413,79 @@ function saveRecord(cat) {
 }
 
 function downloadCSV() {
-    const cats = ["Tithes","Offering","Mission","Lot Fund","Building","Anniversary"];
-    let csv = "ABBCPM FINANCIAL RECORD\n";
-    csv += "Date,Member,Type,Amount,Status\n";
+    const cats = ["Tithes", "Offering", "Mission", "Lot Fund", "Building", "Anniversary"];
+    const today = new Date().toLocaleDateString();
     
-    let subTotals = {}; cats.forEach(c => subTotals[c] = 0);
+    // scope title
+    let reportTitle = currentUser.isAdmin ? "CHURCH-WIDE FINANCIAL REPORT" : `FINANCIAL REPORT FOR: ${currentUser.name}`;
+    let csv = `ADULLAM BIBLE BAPTIST CHURCH\n${reportTitle}\nExported on: ${today}\n\n`;
+    
+    let subTotals = {}; 
+    cats.forEach(c => subTotals[c] = 0);
     let grandTotal = 0;
 
+    // Filter logic
     let visible = records.filter(r => currentUser.isAdmin || r.name === currentUser.name);
+    
     const fDate = document.getElementById('filter-from').value;
     const tDate = document.getElementById('filter-to').value;
     if(fDate) visible = visible.filter(r => r.date >= fDate);
     if(tDate) visible = visible.filter(r => r.date <= tDate);
 
-    visible.forEach(r => {
-        const status = getCommitmentStatus(r.name, r.type, r.amount, r.date);
-        csv += `${r.date},${r.name},${r.type},${r.amount},${status}\n`;
-        if(subTotals.hasOwnProperty(r.type)) subTotals[r.type] += r.amount;
-        grandTotal += r.amount;
+    // Admin Specific Member Filter (using the selector on Admin tab)
+    const memberFilter = document.getElementById('com-member').value;
+    if(currentUser.isAdmin && memberFilter && visible.some(r => r.name === memberFilter)) {
+        visible = visible.filter(r => r.name === memberFilter);
+        csv += `Filtered for Member: ${memberFilter}\n\n`;
+    }
+
+    // Generate Sections
+    cats.forEach(cat => {
+        const filtered = visible.filter(r => r.type === cat);
+        
+        if(filtered.length > 0) {
+            csv += `${cat.toUpperCase()}\n`;
+            
+            // Format headers per user request
+            if (cat === "Tithes" || cat === "Offering") {
+                csv += "Date,Name,Amount\n";
+            } else {
+                csv += "Date,Name,Amount,Status\n";
+            }
+
+            filtered.sort((a,b) => a.date.localeCompare(b.date)).forEach(r => {
+                const status = getCommitmentStatus(r.name, r.type, r.amount, r.date);
+                if (cat === "Tithes" || cat === "Offering") {
+                    csv += `${r.date},${r.name},${r.amount}\n`;
+                } else {
+                    csv += `${r.date},${r.name},${r.amount},${status}\n`;
+                }
+                subTotals[cat] += r.amount;
+                grandTotal += r.amount;
+            });
+            csv += "\n"; 
+        }
     });
 
-    csv += "\n--- SUMMARY ---\n";
+    // SUMMARY Section
+    csv += "---------------------------------\n";
+    csv += "SUMMARY\n";
+    csv += "---------------------------------\n";
     cats.forEach(c => {
-        csv += `${c} Total,, ,${subTotals[c]}\n`;
+        csv += `${c} Total,,${subTotals[c]}\n`;
     });
-    csv += `GRAND TOTAL,, ,${grandTotal}\n`;
+    csv += `\nOVERALL TOTAL:,,${grandTotal}\n`;
 
-    const blob = new Blob([csv], { type: 'text/csv' });
-    const a = document.createElement("a");
-    const today = new Date().toISOString().split('T')[0];
-    a.href = URL.createObjectURL(blob);
-    a.download = `ABBCPM_FINANCIAL_RECORD_${today}.csv`;
-    a.click();
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement("a");
+    const fileName = `ABBCPM_Record_${new Date().toISOString().split('T')[0]}.csv`;
+    
+    link.href = URL.createObjectURL(blob);
+    link.setAttribute("download", fileName);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
 }
-
-// ... (Rest of existing logic for chat, profile, register, etc. remains same) ...
 
 function sendChat() { 
     const v = document.getElementById('chat-input').value; 
